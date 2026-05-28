@@ -1,0 +1,27 @@
+---
+description: MagicSquare Python 코드 스타일 규칙
+alwaysApply: true
+---
+
+# Python Code Style
+
+## Runtime and Formatting
+
+- Python version: `3.13+`
+- Follow `PEP8` strictly
+- Max line length: `88`
+
+## Type Hints
+
+- 모든 함수는 파라미터와 반환 타입 힌트를 반드시 명시한다.
+- 타입 생략은 예외가 아니라 규칙 위반으로 간주한다.
+
+## Docstring
+
+- 모든 public 함수/메서드에 Google 스타일 docstring을 작성한다.
+- docstring에는 목적, 파라미터, 반환값, 예외를 명확히 기술한다.
+
+## Readability
+
+- 의미 있는 이름을 사용하고 축약을 최소화한다.
+- 복잡한 조건/분기는 작은 함수로 분리해 의도를 드러낸다.
