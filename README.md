@@ -1,5 +1,4 @@
-# MagicSquare_cyoon
-
+# MagicSquare_8
 4×4 마방진(Magic Square)을 다루는 학습·연습 프로젝트입니다.  
 현재는 **구현 전 단계**로, STEP 1~5 **문제 정의**까지 완료한 상태입니다.
 
