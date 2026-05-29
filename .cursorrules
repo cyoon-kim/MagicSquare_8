@@ -1,0 +1,128 @@
+################################################################################
+project:
+  name: MagicSquare
+  domain: 4x4 magic square completion
+  language: Python
+
+################################################################################
+code_style:
+  python_version: "3.13+"
+  style_guide: PEP8 엄격 준수
+  type_hints: 모든 함수 파라미터와 반환값에 필수
+  docstring: Google 스타일, 모든 public 메서드에 필수
+  max_line_length: 88
+
+################################################################################
+architecture:
+  pattern: ECB
+  layers:
+    boundary:
+      responsibility:
+        - 외부 입출력 담당 (UI, API, CLI)
+    control:
+      responsibility:
+        - 비즈니스 로직 담당
+    entity:
+      responsibility:
+        - 도메인 데이터 및 규칙 담당
+  dependency_direction:
+    - boundary -> control
+    - control -> entity
+    - entity -> (none)
+  dependency_rules:
+    - boundary는 entity에 직접 의존하지 않는다.
+    - entity는 boundary/control를 참조하지 않는다.
+    - 모든 흐름은 boundary에서 시작해 control을 거쳐 entity로 이동한다.
+
+################################################################################
+tdd_rules:
+  red_phase:
+    description: 테스트를 먼저 작성하고 실패를 확인해 요구사항을 고정하는 단계
+    rules:
+      - 구현 코드 작성 전에 실패 테스트를 먼저 작성한다.
+      - 테스트 실패 원인이 요구사항 검증과 직접 연결되는지 확인한다.
+      - 실패 로그를 확인한 후에만 green_phase로 진행한다.
+    must_not:
+      - 테스트 작성 전에 구현 코드를 먼저 작성하지 않는다.
+      - 실패가 발생하지 않은 테스트를 RED로 간주하지 않는다.
+      - 테스트를 임의로 약화해 인위적으로 실패를 만들지 않는다.
+  green_phase:
+    description: RED 테스트를 통과시키기 위해 최소한의 구현만 수행하는 단계
+    rules:
+      - 테스트를 통과시키는 최소 코드만 작성한다.
+      - 변경 범위를 현재 실패 테스트와 직접 관련된 부분으로 제한한다.
+      - 통과 후 즉시 refactor_phase 진입 가능 상태를 확인한다.
+    must_not:
+      - 이 단계에서 구조 개선 목적의 리팩터링을 수행하지 않는다.
+      - 미래 요구사항을 미리 구현하지 않는다.
+      - 테스트를 우회하는 임시 조건문/하드코딩을 남기지 않는다.
+  refactor_phase:
+    description: 동작을 바꾸지 않고 코드 구조를 개선해 가독성과 유지보수성을 높이는 단계
+    rules:
+      - 기능/출력 계약을 변경하지 않고 구조만 개선한다.
+      - 모든 테스트가 계속 통과하는 상태를 유지한다.
+      - 커버리지는 기존 수준 이상으로 유지한다.
+    must_not:
+      - 새로운 기능 추가를 리팩터링으로 포장하지 않는다.
+      - 테스트 삭제 또는 assertion 완화로 통과 상태를 만들지 않는다.
+      - 커버리지를 하락시키는 변경을 허용하지 않는다.
+
+################################################################################
+testing:
+  framework: pytest
+  pattern: AAA (Arrange-Act-Assert)
+  coverage_minimum: "80%"
+  fixture_scope:
+    - function 스코프를 기본값으로 사용한다.
+    - module/session 스코프는 비용이 큰 공용 리소스에만 제한적으로 사용한다.
+    - fixture는 테스트 간 상태 공유를 만들지 않도록 설계한다.
+  naming_convention: test_ 접두사 필수
+
+################################################################################
+forbidden:
+  - pattern: "print()"
+    reason: 디버깅 출력이 운영 코드에 남아 노이즈와 부작용을 유발한다.
+    alternative: logging 모듈의 구조화 로그 또는 pytest caplog를 사용한다.
+  - pattern: 하드코딩 상수
+    reason: 도메인 의미가 숨겨지고 변경 비용이 증가한다.
+    alternative: 명명된 상수, Enum, 설정 객체로 추출한다.
+  - pattern: "except:"
+    reason: 예외 원인을 숨겨 디버깅과 장애 분석을 어렵게 만든다.
+    alternative: 구체 예외를 명시하고 로깅 후 재전파 또는 도메인 예외로 변환한다.
+
+################################################################################
+file_structure:
+  # ECB 기준 권장 트리
+  # src/
+  #   boundary/
+  #   control/
+  #   entity/
+  # tests/
+  #   boundary/
+  #   control/
+  #   entity/
+  #   integration/
+  root:
+    src:
+      - boundary/
+      - control/
+      - entity/
+    tests:
+      - boundary/
+      - control/
+      - entity/
+      - integration/
+
+################################################################################
+ai_behavior:
+  before_coding:
+    - 코드 작성 전 관련 테스트 파일을 먼저 확인한다.
+    - 기존 테스트 의도와 계약(입출력/예외)을 요약한 뒤 구현을 시작한다.
+  during_coding:
+    - ECB 레이어 경계를 위반하는 코드를 생성하지 않는다.
+    - 타입힌트 없는 함수를 생성하지 않는다.
+    - 변경은 현재 TDD 단계의 목적(RED/GREEN/REFACTOR)에 맞게 제한한다.
+  after_coding:
+    - 테스트를 실행해 회귀 여부를 확인한다.
+    - 커버리지가 최소 기준(80%) 미만인지 점검한다.
+    - tdd_rules 위반이 감지되면 경고를 출력하고 수정 제안을 제공한다.

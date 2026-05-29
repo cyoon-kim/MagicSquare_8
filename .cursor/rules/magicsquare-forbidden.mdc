@@ -1,0 +1,23 @@
+---
+description: MagicSquare 금지 패턴과 대체 방식
+alwaysApply: true
+---
+
+# Forbidden Patterns
+
+## Disallowed
+
+- `print()` in production code
+- bare `except:`
+- 의미 없는 하드코딩 상수
+
+## Why and Alternatives
+
+- `print()`는 운영 코드 노이즈와 부작용을 만든다.
+  - Use: `logging` 기반 구조화 로그, 테스트에서는 `pytest caplog`
+
+- bare `except:`는 예외 원인을 숨겨 디버깅을 어렵게 만든다.
+  - Use: 구체 예외를 명시하고 로깅 후 재전파 또는 도메인 예외로 변환
+
+- 하드코딩 상수는 도메인 의미를 숨기고 변경 비용을 키운다.
+  - Use: 명명 상수, `Enum`, 설정 객체로 추출

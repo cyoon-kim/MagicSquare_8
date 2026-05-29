@@ -1,0 +1,42 @@
+[project]
+name = "magicsquare"
+version = "0.1.0"
+description = "4x4 Magic Square — Dual-Track TDD practice"
+requires-python = ">=3.13"
+readme = "README.md"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pydantic>=2.0",
+]
+gui = [
+    "PyQt6>=6.6",
+]
+
+[project.scripts]
+magicsquare-screen = "boundary.screen.app:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+# Prevent tests/boundary/ from shadowing src/boundary/ on sys.path
+addopts = "--import-mode=importlib"
+markers = [
+    "p0: release gate tests",
+    "boundary: Track A boundary layer tests",
+    "control: Track A-2 control layer tests",
+    "domain: Track B domain layer tests",
+    "golden_master: GM-1 approval / golden master regression tests",
+    "red_bnd_out: AC-22 RED tests — fail until R4 ResultFormatter (excluded from p0 gate)",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+# Per-gate thresholds: Boundary 85, Domain 95, global 80 (see docs/coverage_guide.md)
+fail_under = 80
+show_missing = true
