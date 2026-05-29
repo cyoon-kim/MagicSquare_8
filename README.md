@@ -1,97 +1,59 @@
 # MagicSquare_cyoon
 
-4×4 마방진(Magic Square)을 다루는 학습·연습 프로젝트입니다.  
-현재는 **명세 완료 · RED 진행 중** — PRD v1.1, test_plan, contracts 고정 후 AC-01 Track A RED skeleton 작성 단계입니다.
+4×4 마방진(Magic Square) **두 칸 완성**을 다루는 TDD · ECB 아키텍처 학습 프로젝트입니다.
+
+**현재 단계:** **GREEN 완료** → **REFACTOR 준비**  
+Track A/B 구현·골든 마스터·PyQt6 Screen까지 완료했으며, ECB 의존 정리와 PRD 계약 보완을 위한 리팩터링 계획을 수립한 상태입니다.
 
 ---
 
 ## 프로젝트 개요
 
-4×4 격자에 **1부터 16까지**의 정수를 각 칸에 한 번씩 놓았을 때, 정해진 **마법 선**(행·열·대각선)마다 합이 같고, 그 공통 합이 4×4 마방진의 **마법 상수(34)** 와 일치하는지를 **일관되게 판정**하는 것이 핵심입니다.
+4×4 격자에 **0(빈칸)** 또는 **1~16**을 배치하고, 빈칸 **정확히 2개**·누락 숫자 **2개**를 채워 **마방진(마법 상수 34)** 을 만드는 Use Case입니다.  
+Boundary에서 입력을 검증하고, Domain에서 조합을 시도한 뒤, 성공 시 **int[6]** `(r1,c1,n1,r2,c2,n2)` 1-index 좌표를 반환합니다.
 
 | 구분 | 내용 |
 |------|------|
-| **표면 문제 (피할 정의)** | “4×4 마방진을 완성하는 프로그램” |
-| **진짜 문제** | 고정된 규칙으로 배치의 **유효성을 판정**하고, 조건·입출력·불변을 **먼저 명시**하는 연습 |
-| **현재 단계** | PRD · test_plan · contracts 완료 → FR-01 AC-01 RED |
-| **다음 단계** | RED 테스트 → GREEN 최소 구현 → Track B Domain |
+| **도메인** | 4×4 마방진 두 칸 완성 (FR-02~05a) |
+| **아키텍처** | ECB — `boundary → control → entity` |
+| **현재 단계** | GREEN (43 P0 + GM-1) · REFACTOR 계획 수립 |
+| **다음 단계** | AC-22 RED → 슬라이스 A (R1 contracts → R2/R3) |
+| **브랜치** | `refactor/refactor` (리팩터 작업) |
 
 ---
 
-## 왜 이 프로젝트인가
+## 빠른 시작
 
-### 도메인 (4×4 마방진)
-
-- 규모가 작아 **규칙 분해·검증·테스트** 연습에 적합합니다.
-- “맞다/틀리다”가 명확하지만, **합 일치·숫자 집합·검사 범위**는 별도 조건입니다.
-
-### 프로그램으로 다루는 이유
-
-- **반복 가능성:** 같은 판정 절차를 임의의 배치에 반복 적용
-- **검증 자동화:** 행·열·대각선·중복·범위를 누락 없이 검사
-- **오류 방지:** 수기 계산에서 흔한 “한 줄만 확인” 실수 감소
-- **규칙 기반 사고:** “마방진”을 검증 가능한 조건의 집합으로 다룸
-
-### TDD를 전제로 하는 이유
-
-- 여러 **독립 조건의 교집합**이므로, 테스트로 **판정 계약·불변·입출력**을 먼저 고정하지 않으면 요구가 구현 중에 바뀌기 쉽습니다.
-- 통제의 중심은 UI가 아니라 **판정(검증) 코어**입니다.
-
----
-
-## 핵심 불변 조건 (Invariant)
-
-표준 정의: **4×4**, 값 **{1,…,16}** 각 1회, **행·열·주대각선·부대각선**을 마법 선으로 둠.
-
-| ID | 불변 | 요약 |
-|----|------|------|
-| I1 | 격자 형태 | 4×4, 16칸 |
-| I2 | 칸당 값 | 각 칸에 정확히 하나 |
-| I3 | 숫자 집합 | 1~16 중복·누락 없음 |
-| I5 | 마법 상수 | 각 마법 선의 합 = **34** |
-| I7~I9 | 마법 선 | 4행 · 4열 · 2대각선 |
-| I10~I13 | 판정 절차 | 동일 입력 → 동일 결과, 고정 검사 규칙, 정답/반례 예시 |
-
-> **주의:** “모든 선의 합이 같다”만으로는 1~16 사용이 보장되지 않습니다. **숫자 집합(I3)** 과 **합 34(I5·I7~I9)** 는 별도로 다룹니다.
-
----
-
-## 훈련하려는 사고 능력
-
-1. **규칙 분해** — 마방진을 검증 가능한 조건 여러 개로 나눔  
-2. **계약 사고** — 입력·성공/실패·(선택) 진단을 먼저 합의  
-3. **불변 인식** — 변하지 않아야 할 것과 표현을 구분  
-4. **경계·반례 설계** — 한 조건만 깨는 예시를 의도적으로 만듦  
-5. **검증 우선** — “만들기”보다 “맞는지 판단하기”를 먼저 안정화  
-6. **범위 통제** — 4×4 고정, 생성/UI는 판정 계약을 깨지 않는 한 후순위  
-7. **명세 선행** — 구현 전에 조건·입출력·불변을 고정  
-
-### 비목표 (이번 문제 정의 단계)
-
-- 손으로 퍼즐을 빨리 푸는 속도
-- 특정 구성 기법만 외우는 것
-- 제품 수준의 UI·성능·배포 (별도 단계에서 다룰 수 있음)
-
----
-
-## 문제 정의 워크숍 (STEP 1~5)
-
-| STEP | 주제 | 핵심 |
-|------|------|------|
-| 1 | Observation | 16개 숫자 배치와 여러 선의 합 일치를 다루는 상황 |
-| 2 | Why #1 | “완성” vs “검증”, 다중 규칙, 과정 vs 결과 |
-| 3 | Why #2 | 프로그램 = 절차 복제·자동 판정·규칙 명시 |
-| 4 | Why #3 | TDD로 판정 계약·불변·입출력 통제 |
-| 5 | 진짜 문제 정의 | 표면/개선 정의, Invariant, 훈련 목표 |
-
-상세 내용은 보고서를 참고하세요.
-
----
-
-## GUI 실행 (PyQt6)
+### 테스트 (P0 + Golden Master)
 
 ```powershell
 cd MagicSquare_XX
+pip install -e ".[dev]"
+
+# P0 회귀
+python -m pytest tests/boundary/ tests/control/ tests/entity/ -m p0 -v
+
+# Golden Master
+python -m pytest tests/test_gm_01_magic_square_golden_master.py -v
+python -m pytest -m golden_master -v
+```
+
+### 커버리지 gate ([`docs/coverage_guide.md`](docs/coverage_guide.md))
+
+```powershell
+# Entity 95%+ (NFR-01) — PASS (Report/11: 96.55%)
+python -m pytest tests/entity/ --cov=src/entity --cov-report=term-missing --cov-fail-under=95
+
+# Boundary 85%+ (NFR-02) — screen/ 포함 시 FAIL (~38%); omit 또는 smoke 정책 필요
+python -m pytest tests/boundary/ --cov=src/boundary --cov-report=term-missing --cov-fail-under=85
+
+# 전역 80%+
+python -m pytest tests/boundary/ tests/control/ tests/entity/ --cov=src --cov-report=term-missing --cov-fail-under=80
+```
+
+### GUI (PyQt6)
+
+```powershell
 pip install -e ".[gui,dev]"
 python -m boundary.screen.app
 ```
@@ -101,19 +63,33 @@ python -m boundary.screen.app
 
 ---
 
+## ECB 레이어
+
+```
+boundary/          control/                    entity/
+├── BoundaryValidator   SolveMagicSquareUseCase   ├── BlankFinder
+├── ResultFormatter     (FR-06 orchestration)     ├── MissingNumberFinder
+├── models (ErrorResponse)                        ├── MagicSquareValidator
+└── screen/ (PyQt6)                               └── Solver
+```
+
+**의존 방향:** `boundary → control → entity` · `entity → (none)`
+
+> **REFACTOR 알림:** 현재 entity→boundary, control→boundary, `app.py`→entity 위반이 기록되어 있습니다.  
+> 상세: [`docs/refactor-plan.md`](docs/refactor-plan.md) · [`docs/defect_list.md`](docs/defect_list.md) (QA-RISK-001~011)
+
+---
+
 ## Golden Master 회귀 테스트 (GM-1)
 
-`SolveMagicSquareUseCase`의 **실제 출력**을 스냅샷으로 고정하는 Approval / Golden Master 회귀 레이어입니다.  
-단위 AC 테스트(U-OUT, U-IN 등)를 대체하지 않으며, **Control E2E 출력 계약** 변경을 한 번에 감지합니다.
+`SolveMagicSquareUseCase`의 **실제 출력**을 스냅샷으로 고정하는 Approval / Golden Master 회귀 레이어입니다.
 
 | 항목 | 내용 |
 |------|------|
 | **Test ID** | GM-1 |
-| **기준 파일** | `tests/golden_master_expected.txt` (Git 버전 관리 필수) |
+| **기준 파일** | `tests/golden_master_expected.txt` |
 | **시나리오 SSOT** | `tests/golden_master_scenarios.py` |
 | **설계 문서** | [docs/golden_master_design.md](docs/golden_master_design.md) |
-
-### 시나리오 (5종)
 
 | Section | Test ID | 의미 |
 |---------|---------|------|
@@ -123,35 +99,15 @@ python -m boundary.screen.app
 | `duplicate_number` | GM-TC-04 | non-zero 중복 → `INPUT_DUPLICATE_NON_ZERO` |
 | `no_valid_solution` | GM-TC-05 | dual-fail → `DOMAIN_NO_MAGIC_ASSIGNMENT` |
 
-### 실행
-
 ```powershell
-cd MagicSquare_XX
-
 # 회귀 검증
 pytest tests/test_gm_01_magic_square_golden_master.py -v
-pytest -m golden_master -v
 
-# 의도적 출력 변경 후 기준 갱신 (approve)
+# 의도적 출력 변경 후 기준 갱신
 pytest tests/test_gm_01_magic_square_golden_master.py --approve-golden -v
-
-# CLI로 생성/갱신
 python scripts/generate_golden_master.py
-
-# CI compare-only (불일치 시 exit 1)
-python scripts/generate_golden_master.py --check
+python scripts/generate_golden_master.py --check   # CI compare-only
 ```
-
-### Approve 패턴
-
-| 상태 | 동작 | 결과 |
-|------|------|------|
-| 기준 파일 **없음** | 현재 출력으로 자동 생성 | PASS (`created`) |
-| 기준 파일 **있음**, 일치 | actual vs expected 비교 | PASS (`matched`) |
-| **불일치** | unified diff 출력 후 FAIL | FAIL |
-| `--approve-golden` / generate script | 기준 파일 덮어쓰기 | PASS (`updated`) |
-
-출력 캡처는 stdout이 아니라 **Result DTO 직렬화** (`list[int]` 성공 / `ErrorResponse.error.code` 실패)입니다.
 
 ---
 
@@ -160,35 +116,29 @@ python scripts/generate_golden_master.py --check
 ```
 MagicSquare_XX/
 ├── README.md
-├── pyproject.toml              # pytest, pydantic, pytest-cov
+├── pyproject.toml
 ├── docs/
 │   ├── PRD_MagicSquare.md
 │   ├── test_plan.md
-│   ├── contracts.md            # API Single Source of Truth
-│   ├── golden_master_design.md # GM-1 Approve 패턴 설계
-│   └── defect_list.md
-├── scripts/
-│   └── generate_golden_master.py
+│   ├── contracts.md
+│   ├── refactor-plan.md        # REFACTOR 백로그 R1~R12 (REF-MSQ-001)
+│   ├── defect_list.md          # 결함·QA-RISK 추적
+│   ├── coverage_guide.md
+│   ├── golden_master_design.md
+│   └── red_implementation_checklist.md
 ├── src/
-│   ├── boundary/               # BoundaryValidator, ResultFormatter
-│   │   └── screen/             # PyQt6 GUI (예제 패턴: QSpinBox + 풀기)
+│   ├── boundary/               # BoundaryValidator, ResultFormatter, screen/
 │   ├── control/                # SolveMagicSquareUseCase
-│   └── entity/                 # Domain Logic (FR-02~05a) — 실습 ECB Entity
+│   └── entity/                 # BlankFinder, Solver, …
 ├── tests/
-│   ├── boundary/
-│   ├── control/
-│   ├── entity/                 # Track B Domain RED
-│   ├── golden_master_expected.txt   # GM-1 기준 출력 (버전 관리)
-│   ├── golden_master_scenarios.py
-│   ├── golden_master_support.py
-│   ├── golden_master_conftest.py
+│   ├── boundary/  control/  entity/
+│   ├── golden_master_*.py / golden_master_expected.txt
 │   ├── test_gm_01_magic_square_golden_master.py
-│   ├── test_golden_master_magic_square.py   # alias (no duplicate collection)
 │   └── legacy/                 # User 샘플 (실습 Domain 아님)
-├── legacy/
-│   └── entity/user.py          # moved from src/entity (learning sample)
-├── Report/
-└── Prompt/
+├── legacy/entity/user.py
+├── Report/                     # 진행 보고서 (최신: 13)
+├── Prompt/                     # Transcript (최신: 13)
+└── scripts/generate_golden_master.py
 ```
 
 ---
@@ -197,111 +147,74 @@ MagicSquare_XX/
 
 | 문서 | 설명 |
 |------|------|
-| [docs/PRD_MagicSquare.md](docs/PRD_MagicSquare.md) | FR/AC/BR, I/O 계약, Dual-Track TDD 전략 |
-| [docs/test_plan.md](docs/test_plan.md) | FR-01 AC-01 테스트 계획 (BV, mock, pytest-cov) |
-| [docs/contracts.md](docs/contracts.md) | API 시그니처 · Pydantic · error code Single Source |
-| [docs/defect_list.md](docs/defect_list.md) | 결함 추적 템플릿 |
-| [docs/red_implementation_checklist.md](docs/red_implementation_checklist.md) | 코드 Sprint 보류 항목 (legacy, skeleton, RED) |
-| [docs/coverage_guide.md](docs/coverage_guide.md) | **실습 §6 커버리지 명령** (entity/boundary gate) |
-| [docs/golden_master_design.md](docs/golden_master_design.md) | GM-1 Golden Master · Approve 패턴 · 시나리오·실행 방법 |
-| [Report/01_MagicSquare_ProblemDefinition_STEP1-5.md](Report/01_MagicSquare_ProblemDefinition_STEP1-5.md) | STEP 1~5 전체 산출물 |
-| [Prompt/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md](Prompt/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md) | 문제 정의 워크숍 프롬프트 |
+| [docs/PRD_MagicSquare.md](docs/PRD_MagicSquare.md) | FR/AC/BR, I/O 계약, Dual-Track TDD |
+| [docs/contracts.md](docs/contracts.md) | API · Pydantic · error code SSOT |
+| [docs/test_plan.md](docs/test_plan.md) | AC별 테스트·시나리오·RED ID |
+| [**docs/refactor-plan.md**](docs/refactor-plan.md) | **REFACTOR 백로그, 슬라이스, 회귀 gate** |
+| [docs/defect_list.md](docs/defect_list.md) | DEF Close/Open, QA-RISK 레지스트리 |
+| [docs/coverage_guide.md](docs/coverage_guide.md) | entity/boundary/global 커버리지 gate |
+| [docs/golden_master_design.md](docs/golden_master_design.md) | GM-1 Approve 패턴 |
+| [Report/13_MagicSquare_CodeReview_QA_RefactorPlan_Report.md](Report/13_MagicSquare_CodeReview_QA_RefactorPlan_Report.md) | code-reviewer·QA 검토 보고 |
+| [Prompt/13_MagicSquare_CodeReview_QA_RefactorPlan_transcript.md](Prompt/13_MagicSquare_CodeReview_QA_RefactorPlan_transcript.md) | 대응 Transcript |
 
 ---
 
-## 상태
+## 진행 상태
 
-- [x] STEP 1 — Observation  
-- [x] STEP 2 — Why #1  
-- [x] STEP 3 — Why #2  
-- [x] STEP 4 — Why #3  
-- [x] STEP 5 — 진짜 문제 정의  
-- [x] PRD v1.1 — Functional Requirements · Error Policy  
-- [x] test_plan v1.1 — FR-01 AC-01  
-- [x] contracts.md — API / terminology 고정  
-- [ ] FR-01 AC-01 RED 테스트  
-- [ ] FR-01 GREEN (BoundaryValidator)  
-- [ ] Track B Domain RED (FR-02~05a)  
-- [ ] 실행 환경 · CI gate  
-- [ ] (선택) 생성기 · UI  
-- [x] GM-1 Golden Master — `tests/golden_master_expected.txt` + approve 패턴
+### 완료
+
+- [x] STEP 1~5 문제 정의 · PRD v1.1 · contracts · test_plan
+- [x] Track A Boundary (FR-01) — AC-01, AC-05, AC-23
+- [x] Track B Entity (FR-02~05a) — blank, missing, validator, solver
+- [x] Control (FR-06) — `SolveMagicSquareUseCase`
+- [x] GM-1 Golden Master (GM-TC-01~05)
+- [x] PyQt6 Screen ([Report/12](Report/12_MagicSquare_PyQt6_Screen_Migration_Report.md))
+- [x] REFACTOR 계획 · QA 리스크 정리 ([Report/13](Report/13_MagicSquare_CodeReview_QA_RefactorPlan_Report.md))
+
+### REFACTOR Sprint (진행 예정)
+
+리팩터 merge마다 [`docs/refactor-plan.md`](docs/refactor-plan.md) §10 회귀 gate 실행.
+
+| 우선순위 | 항목 | 참조 |
+|----------|------|------|
+| 1 | AC-22 RED (RED-BND-OUT-001/002) | R4 선행 |
+| 2 | NFR-04 matrix 불변성 · AC-24 UseCase G3 | QA 공백 |
+| 3 | 슬라이스 A: R1 contracts → R2 ports → R3 factory | ECB 정리 |
+| 4 | 슬라이스 B: R4 FR-05b ResultFormatter | AC-22 GREEN |
+| 5 | 슬라이스 C: R5 Solver API · R6 UseCase chain | §13 오류 코드 |
+| 6 | Boundary cov 정책 (`screen/` omit vs smoke) | QA-RISK-007 |
+
+### 알려진 이슈 (Open)
+
+| ID | 요약 |
+|----|------|
+| QA-RISK-001~002 | ECB 의존 역전 (entity↔boundary, app→entity) |
+| QA-RISK-003~004 | FR-05b 미구현, 1-index 레이어 혼재 |
+| QA-RISK-005~006 | UseCase dead call, Solver 이중 API |
+| DEF-005 | legacy 커버리지 79% (< 80% gate) |
+
+전체 목록: [`docs/defect_list.md`](docs/defect_list.md)
 
 ---
 
-## RED 단계 To-Do 리스트
+## 핵심 불변 조건 (Invariant)
 
-> [`docs/test_plan.md`](docs/test_plan.md) · [`docs/PRD_MagicSquare.md`](docs/PRD_MagicSquare.md) · [`docs/contracts.md`](docs/contracts.md) 기반.  
-> **Sprint 범위:** FR-01 AC-01 · AC-05 · AC-23 · TS-E-01 · 공개 파라미터명 **`matrix`**
+| ID | 불변 | 요약 |
+|----|------|------|
+| I1 | 격자 형태 | 4×4, 16칸 |
+| I3 | 숫자 집합 | 1~16 (0=빈칸) 중복·누락 규칙 |
+| I5 | 마법 상수 | 각 마법 선의 합 = **34** |
+| I7~I9 | 마법 선 | 4행 · 4열 · 2대각선 |
 
-### Golden Master 회귀 안전장치
+---
 
-> Refactoring 시작 전 구축. GREEN 완료 후 즉시 적용.  
-> 설계: [`docs/golden_master_design.md`](docs/golden_master_design.md)
+## TDD · 프로젝트 규칙
 
-#### 기준 파일 생성
-
-- [x] **GM-01:** `golden_master_expected.txt` 생성
-- [x] **GM-02:** 정상/역순/오류 시나리오 추가 (GM-TC-01~05)
-- [x] **GM-03:** `git add tests/golden_master_expected.txt` (버전 관리 포함)
-
-#### 테스트 코드
-
-- [x] **GM-04:** `test_gm_01_magic_square_golden_master` 작성
-- [x] **GM-05:** approve 패턴 적용 (`--approve-golden`, `generate_golden_master.py`)
-- [x] **GM-06:** Golden Master 테스트 PASS 확인 (`pytest -m golden_master -v`)
-
-#### 회귀 보호
-
-- [x] **GM-07:** row-major 규칙 보호 (`assert_row_major_blank_order`)
-- [x] **GM-08:** 1-index 출력 보호 (`assert_int6_output_contract`)
-- [x] **GM-09:** reverse 조합 fallback 보호 (`assert_reverse_fallback_combination`)
-- [x] **GM-10:** Error Contract 보호 (`assert_error_contract`)
-
-### Track A — Boundary (FR-01)
-
-- [ ] TC-A-01 (BV-01): `matrix=None` → `ErrorResponse`, 예외 throw 없음 (AC-01, §13)
-- [ ] TC-A-02: `error.code == "INPUT_SIZE_INVALID"` (AC-01, §12.1)
-- [ ] TC-A-03: `error.message == "Input matrix must be 4x4."` (§13)
-- [ ] TC-A-05 (BV-02): `matrix=[]` → `INPUT_SIZE_INVALID` (AC-01)
-- [ ] TC-A-06 (BV-03): `matrix=[[]]*4` → `INPUT_SIZE_INVALID` (AC-01)
-- [ ] TC-A-07 (BV-04~06): 3×4 · 4×3 · 5×5 · TD-03 → `INPUT_SIZE_INVALID` (AC-01, TS-E-01)
-- [ ] TC-A-08: §13 Pydantic `ErrorResponse` 스키마 준수
-- [ ] TC-A-09: TD-01(4×4 정상) 테스트 **미포함** 확인
-
-### Track A-2 — Control 격리 (FR-06, AC-05, AC-23)
-
-- [ ] TC-A2-01 (TC-A-04): `matrix=None` 시 Domain chain 0회 — `BlankFinder` · `MissingNumberFinder` · `MagicSquareValidator` · `Solver` mock/spy
-- [ ] TC-A2-02: `ResultFormatter.format()` 0회 호출 (FR-01 fail path)
-- [ ] TC-A2-03: Domain/Formatter mock `call_count > 0` → 테스트 실패
-- [ ] TC-A2-04: AC-02~04(TS-E-02~04) **본 Sprint RED 미포함** 확인
-
-### Track B — Domain Logic (FR-02~05a)
-
-> **본 Sprint OUT OF SCOPE** — skeleton stub만 존재. RED는 FR-02~05a Sprint에서 진행.
-
-### 커버리지 목표 (실습 §6 — [`docs/coverage_guide.md`](docs/coverage_guide.md))
-
-```bash
-pip install pytest pydantic pytest-cov
-
-# Boundary 85%+ (NFR-02)
-python -m pytest tests/boundary/ --cov=src/boundary --cov-report=term-missing --cov-fail-under=85
-
-# Domain(Entity) 95%+ (NFR-01)
-python -m pytest tests/entity/ --cov=src/entity --cov-report=term-missing --cov-fail-under=95
-
-# 전역 80% (실습 gate)
-python -m pytest --cov=src --cov-report=term-missing --cov-fail-under=80
-```
-
-- [ ] Sprint AC-01: Boundary RED — `ModuleNotFoundError: No module named 'boundary'` (정상)
-- [ ] Sprint AC-01 GREEN 후: Boundary **85%+**, Control early-return **85%+**
-- [ ] FR-02~05a: `tests/entity/` + `src/entity/` **95%+**
-
-### 결함 목록 연결
-
-- [x] [`docs/defect_list.md`](docs/defect_list.md) 발견 결함 기록 (DEF-001~006, 2026-05-29)
-- [ ] 결함 수정 후 회귀 테스트 통과
+- **프레임워크:** pytest, AAA 패턴
+- **커버리지:** entity ≥95%, boundary ≥85%, global ≥80%
+- **business error:** `ErrorResponse` 객체 반환 — `pytest.raises` 금지 (entity는 R5에서 정렬 예정)
+- **금지:** production `src/`에 `print()`, bare `except:`, 의미 없는 매직 상수
+- **Cursor rules:** `.cursor/rules/magicsquare-*.mdc`
 
 ---
 
