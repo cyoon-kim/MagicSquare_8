@@ -7,7 +7,7 @@
 | Version | 1.2 |
 | Date | 2026-05-29 |
 | Reference | `docs/test_plan.md`, `docs/PRD_MagicSquare.md`, `docs/contracts.md`, `docs/refactor-plan.md` |
-| Sprint | GREEN 완료 → REFACTOR 준비 |
+| Sprint | GREEN + REFACTOR 완료 (2026-05-29) |
 
 ---
 
@@ -24,7 +24,7 @@
 | QA-RISK-006 | High | §13 | `Solver.solve()` vs `solve_or_error()` | 단일 error 객체 API | ~~raise + ErrorResponse 이중 API~~ | 설계 미정 | **Close (R5):** `solve()` only |
 | QA-RISK-007 | Medium | NFR-02 | `pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85` | ≥85% | ~38% FAIL (full) | `screen/` 0% | **정책 결정:** core omit gate (coverage_guide §4); smoke는 R3/R11 후 |
 | QA-RISK-008 | Medium | — | `grep "print(" src/` | print 없음 | ~~app.py print~~ | dev CLI 잔존 | **Close (R11):** logging |
-| QA-RISK-011 | Low | §13 | `models.py` 오류 코드 목록 | PRD §13 전체 | 4개 코드 미등록 | GREEN Sprint 범위 밖 | R1/R4/R5 |
+| QA-RISK-011 | Low | §13 | `models.py` 오류 코드 목록 | PRD §13 전체 | ~~4개 미등록~~ | GREEN 범위 밖 | **Close (R12):** contracts.errors SSOT |
 
 ---
 
@@ -40,20 +40,20 @@
 
 ---
 
-## Test Run Snapshot (2026-05-29, GREEN 기준)
+## Test Run Snapshot (2026-05-29, REFACTOR baseline)
 
 ```text
-pytest tests/boundary/ tests/control/ tests/entity/ -m p0
-  → 43 passed (Report/11)
+pytest tests/boundary/ tests/control/ tests/entity/ tests/contracts/ -m p0
+  → 55 passed
 
 pytest tests/test_gm_01_magic_square_golden_master.py
   → 6 passed (골든 마스터)
 
 pytest tests/entity/ --cov=src/entity --cov-fail-under=95
-  → 96.55% PASS
+  → PASS (Report/11: 96.55%)
 
-pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85
-  → ~38% FAIL (screen/ 미포함 테스트)
+coverage run --omit=src/boundary/screen/* + pytest tests/boundary/
+  → core boundary ≥85% PASS (coverage_guide §4)
 ```
 
 ---
@@ -62,11 +62,8 @@ pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85
 
 - [x] DEF-001~004 Close (GREEN 완료)
 - [x] DEF-006 Close (entity 테스트 존재)
-- [ ] QA-RISK-003~011 — refactor-plan 슬라이스별 Close
-- [x] QA-RISK-001 Close (R1 contracts)
-- [x] QA-RISK-003 Close (R4 FR-05b)
-- [x] QA-RISK-005 Close (R6 orchestration)
-- [x] QA-RISK-008 Close (R11 logging)
+- [x] QA-RISK-001~008, 011 Close (REFACTOR R1~R12)
+- [ ] QA-RISK-007 screen smoke · QA-RISK-009/010 — 후속
 - [x] AC-22 RED-BND-OUT-001/002 GREEN (R4) — p0 gate 포함
 - [x] NFR-04 matrix 불변성 테스트 — `test_nfr_04_matrix_immutability.py`
 - [x] AC-24 UseCase G3 → ErrorResponse — `test_ac_24_g3_failure_no_success_format.py`
@@ -81,4 +78,4 @@ pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85
 |---|---|---|
 | 1.0 | 2026-05-29 | Initial template |
 | 1.1 | 2026-05-29 | FR-01 RED 결함 DEF-001~006 등록 |
-| 1.2 | 2026-05-29 | GREEN Close (DEF-001~004, DEF-006); QA-RISK-001~011 Open 등록; refactor-plan 연계 |
+| 1.3 | 2026-05-29 | REFACTOR Close; QA-RISK-001~008/011 Close; snapshot 55 P0 |

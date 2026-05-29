@@ -2,8 +2,8 @@
 
 4×4 마방진(Magic Square) **두 칸 완성**을 다루는 TDD · ECB 아키텍처 학습 프로젝트입니다.
 
-**현재 단계:** **REFACTOR 진행 중** (R7 완료)  
-Track A/B 구현·골든 마스터·PyQt6 Screen까지 완료했으며, ECB 의존 정리와 PRD 계약 보완 리팩터링을 진행 중입니다.
+**현재 단계:** **REFACTOR 완료** (7/7)  
+Track A/B · GM-1 · PyQt6 Screen · ECB 리팩터링 · 문서 SSOT 동기화까지 완료했습니다.
 
 ---
 
@@ -16,8 +16,8 @@ Boundary에서 입력을 검증하고, Domain에서 조합을 시도한 뒤, 성
 |------|------|
 | **도메인** | 4×4 마방진 두 칸 완성 (FR-02~05a) |
 | **아키텍처** | ECB — `boundary → control → entity` |
-| **현재 단계** | REFACTOR 진행 중 (item 6 위생 완료 · 7항목 중 6완료) |
-| **다음 단계** | 문서 SSOT 동기화 (R12 + §13) |
+| **현재 단계** | REFACTOR **완료** (7/7) |
+| **다음 단계** | DEF-005 legacy cov · screen smoke (선택) |
 | **브랜치** | `refactor/refactor` (리팩터 작업) |
 
 ---
@@ -187,9 +187,9 @@ MagicSquare_XX/
 | 4 | **슬라이스 B — Boundary 출력** — `ResultFormatter` FR-05b, int[6] 검증, +1 index 이동 | R4 (AC-22 GREEN) | ✅ |
 | 5 | **슬라이스 C — Domain·UseCase** — Solver 단일 error API, §13 `DOMAIN_*`, dead orchestration 제거 | R5 + R6 | ✅ |
 | 6 | **코드·테스트 위생** — conftest fixture, docstring, assertion 정리, `print`→logging | R8 + R9 + R10 + R11 | ✅ |
-| 7 | **문서 SSOT 동기화** — `contracts.md`↔`models.py`, test_plan·checklist·coverage_guide | R12 + §13 | ⬜ |
+| 7 | **문서 SSOT 동기화** — `contracts.md`↔`models.py`, test_plan·checklist·coverage_guide | R12 + §13 | ✅ |
 
-**진행:** 6 / 7 완료
+**진행:** 7 / 7 완료 ✅
 
 #### 체크리스트 (merge 시 `[x]` 갱신)
 
@@ -215,16 +215,16 @@ MagicSquare_XX/
   - [x] R9 public API Google docstring
   - [x] R10 중복 assertion 정리 (cosmetic)
   - [x] R11 `app.py` `print()` → `logging`
-- [ ] **7. 문서 SSOT (R12 + §13)**
-  - [ ] `docs/contracts.md` ↔ `src/boundary/models.py` parity
-  - [ ] `docs/test_plan.md` · `docs/red_implementation_checklist.md` 상태 갱신
-  - [ ] `docs/coverage_guide.md` boundary cov note
+- [x] **7. 문서 SSOT (R12 + §13)**
+  - [x] `docs/contracts.md` ↔ `src/contracts/errors.py` parity
+  - [x] `docs/test_plan.md` · `docs/red_implementation_checklist.md` 상태 갱신
+  - [x] `docs/coverage_guide.md` boundary cov note (item 2)
 
 ### 알려진 이슈 (Open)
 
 | ID | 요약 |
 |----|------|
-| QA-RISK-007~011 | Boundary cov, stale docs (R12) |
+| QA-RISK-007 | screen cov smoke (omit 정책 적용 중) |
 | DEF-005 | legacy 커버리지 79% (< 80% gate) |
 
 전체 목록: [`docs/defect_list.md`](docs/defect_list.md)

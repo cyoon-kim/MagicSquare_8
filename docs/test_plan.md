@@ -3,8 +3,8 @@
 | 항목 | 내용 |
 |---|---|
 | Document ID | TP-MSQ-FR01-AC01-001 |
-| Status | Draft |
-| Version | 1.0 |
+| Status | **Active — Full Track A/B implemented** (REFACTOR 2026-05-29) |
+| Version | 1.2 |
 | Date | 2026-05-29 |
 | Author Role | Senior QA Lead |
 | Reference PRD | `docs/PRD_MagicSquare.md` — FR-01, AC-01, AC-05, AC-23, §12.1, §13 |
@@ -390,3 +390,60 @@ pytest tests/entity/ \
 |---|---|---|
 | 1.0 | 2026-05-29 | Initial test plan — FR-01 AC-01 sample (matrix=None), boundary cases, mock strategy, pytest-cov |
 | 1.1 | 2026-05-29 | contracts.md alignment: matrix terminology, ID mapping, ResultFormatter spy |
+| 1.2 | 2026-05-29 | Appendix B: full Track A/B + REFACTOR test inventory (post-GREEN) |
+
+---
+
+## Appendix B — Full Implementation Test Inventory (2026-05-29)
+
+본 Appendix는 §1.2 Out-of-Scope였던 항목이 **GREEN + REFACTOR Sprint**에서 구현·검증된 범위를 기록한다.
+
+### B.1 Track A — Boundary (`tests/boundary/`)
+
+| Area | Test module | Markers | AC / ID |
+|---|---|---|---|
+| AC-01 size | `test_fr01_ac01_boundary_validator.py` | p0 | AC-01 |
+| §13 schema | `test_fr01_ac01_error_contract.py` | p0 | AC-01 |
+| AC-02~04 input | `test_u_in_04_08_input_validation.py` | p0 | U-IN-04~08 |
+| AC-05/23 isolation | `test_u_flow_02_domain_isolation_extended.py` | p0 | U-FLOW-02 |
+| FR-05b output | `test_u_out_01_03_output_contract.py` | p0 | U-OUT-01~03 |
+| AC-22 format | `test_red_bnd_out_001/002_*.py` | p0 | RED-BND-OUT |
+| R3 composition | `test_app_composition_root.py` | boundary | R3 |
+| R11 logging | `test_app_verify_logging.py` | boundary | R11 |
+
+### B.2 Track A-2 — Control (`tests/control/`)
+
+| Area | Test module | Markers | AC / ID |
+|---|---|---|---|
+| AC-05/23 | `test_fr01_ac05_ac23_use_case_isolation.py` | p0 | AC-05, AC-23 |
+| NFR-04 | `test_nfr_04_matrix_immutability.py` | p0 | NFR-04 |
+| AC-24 | `test_ac_24_g3_failure_no_success_format.py` | p0 | AC-24 |
+| R3 factory | `test_factory_builds_use_case.py` | p0 | R3 |
+| R2 ports | `test_control_ports_dependency.py` | control | R2 |
+| R6 orchestration | `test_r6_use_case_orchestration.py` | p0 | R6 |
+
+### B.3 Track B — Entity (`tests/entity/`)
+
+| Area | Test module | Markers | FR |
+|---|---|---|---|
+| Blank coords | `test_d_loc_01_blank_coords.py` | p0 | FR-02 |
+| Missing numbers | `test_d_mis_01_missing_numbers.py` | p0 | FR-03 |
+| Validator | `test_d_val_01_06_magic_square_validator.py` | p0 | FR-04 |
+| Solver | `test_d_sol_01_04_two_cell_solver.py` | p0 | FR-05a, R5 |
+
+### B.4 Cross-cutting
+
+| Area | Test module | Notes |
+|---|---|---|
+| Contracts | `tests/contracts/test_error_schema.py` | R1 import smoke |
+| Golden Master | `tests/test_gm_01_magic_square_golden_master.py` | GM-TC-01~05 |
+| Fixture SSOT | `tests/conftest.py` → `solve_use_case` | R8 |
+
+### B.5 Current P0 Gate (REFACTOR baseline)
+
+```bash
+python -m pytest tests/boundary/ tests/control/ tests/entity/ tests/contracts/ -m p0 -v
+# → 55 passed (2026-05-29)
+python -m pytest tests/test_gm_01_magic_square_golden_master.py -v
+# → 6 passed
+```

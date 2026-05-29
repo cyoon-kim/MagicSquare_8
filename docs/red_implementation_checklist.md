@@ -1,118 +1,78 @@
-# RED Implementation Checklist — Pending Code Sprint
+# RED Implementation Checklist — Status
 
-> 문서 동기화 완료 후, **코드 작성 시** 이 순서대로 진행합니다.  
-> Plan mode에서는 `.py` / `.mdc` / `pyproject.toml` 수정이 불가하여 본 문서에 보류 항목을 기록합니다.
-
----
-
-## Completed (Documentation)
-
-- [x] [`docs/contracts.md`](contracts.md) — API Single Source of Truth
-- [x] [`docs/test_plan.md`](test_plan.md) v1.1 — matrix 용어, ID mapping, ResultFormatter spy
-- [x] [`docs/defect_list.md`](defect_list.md) — 결함 템플릿
-- [x] [`docs/PRD_MagicSquare.md`](PRD_MagicSquare.md) §22 — AC-01 defensive inputs closed
-- [x] [`README.md`](../README.md) — Track A / A-2 / B 분리, 상태·구조 갱신
-- [x] [`Report/02_...md`](../Report/02_MagicSquare_DualTrack_UI_Logic_TDD_CleanArchitecture.md) — Superseded 배너
+> **2026-05-29:** Track A/B GREEN + REFACTOR Sprint (items 1–7) **완료**.  
+> 본 문서는 초기 RED 스프린트 체크리스트의 **이력 보존** 및 현재 상태 요약입니다.
 
 ---
 
-## Pending Step 1 — legacy/ 이동
+## Completed — Documentation
 
-```text
-src/entity/user.py          → legacy/entity/user.py
-tests/entity/test_user_entity.py → tests/legacy/test_user_entity.py
-```
-
-`tests/conftest.py`에 legacy path 추가:
-
-```python
-LEGACY_PATH = Path(__file__).resolve().parents[1] / "legacy"
-if str(LEGACY_PATH) not in sys.path:
-    sys.path.insert(0, str(LEGACY_PATH))
-```
-
-`src/entity/` 디렉터리 삭제.
+- [x] [`docs/contracts.md`](contracts.md) v1.1 — SSOT `src/contracts/errors.py`
+- [x] [`docs/test_plan.md`](test_plan.md) — FR-01 baseline + Appendix B full scope
+- [x] [`docs/defect_list.md`](defect_list.md) — DEF Close, QA-RISK 추적
+- [x] [`docs/refactor-plan.md`](refactor-plan.md) — R1~R12 백로그
+- [x] [`docs/coverage_guide.md`](coverage_guide.md) — boundary omit 정책 (QA-RISK-007)
+- [x] [`README.md`](../README.md) — REFACTOR 7항목 체크리스트
 
 ---
 
-## Pending Step 2 — Cursor rules (`.cursor/rules/`)
+## Completed — Implementation (GREEN Sprint)
 
-### `magicsquare-ecb-architecture.mdc`
-
-- `entity` → `domain`
-- `src/entity/` → `src/domain/`
-- `legacy/entity/` · `tests/legacy/` 추가
-- Reference: `docs/contracts.md`
-
-### `magicsquare-tdd-testing.mdc`
-
-- Coverage: Boundary **85%+**, Domain **95%+** (80% 제거)
-- `matrix` terminology, business error `pytest.raises` 금지
-- pytest-cov 명령 예시 추가
+- [x] `src/contracts/errors.py` — shared DTO + §13 codes (R1)
+- [x] `src/boundary/` — BoundaryValidator, ResultFormatter (FR-05b), models re-export
+- [x] `src/control/` — SolveMagicSquareUseCase, ports, factory (R2/R3)
+- [x] `src/entity/` — BlankFinder, MissingNumberFinder, Validator, Solver (FR-02~05a)
+- [x] `tests/boundary/` · `tests/control/` · `tests/entity/` — Track A/B P0
+- [x] GM-1 Golden Master (GM-TC-01~05)
+- [x] PyQt6 Screen (`src/boundary/screen/`)
 
 ---
 
-## Pending Step 3 — `pyproject.toml`
+## Completed — REFACTOR Sprint (R1~R12)
 
-```toml
-[project]
-name = "magicsquare"
-version = "0.1.0"
-requires-python = ">=3.13"
-
-[project.optional-dependencies]
-dev = ["pytest>=8.0", "pytest-cov>=5.0", "pydantic>=2.0"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-markers = [
-    "p0: release gate",
-    "boundary: Track A boundary tests",
-    "control: Track A-2 control tests",
-]
-```
+| Item | ID | Status |
+|---|---|---|
+| 숫자 상수 SSOT | R7 | ✅ |
+| 선행 게이트 (AC-22 RED, NFR-04, cov 정책) | §14 | ✅ |
+| ECB 구조 (contracts, ports, factory) | R1~R3 | ✅ |
+| ResultFormatter FR-05b | R4 | ✅ |
+| Solver 단일 API + UseCase slim | R5~R6 | ✅ |
+| 테스트 위생 (fixture, docstring, logging) | R8~R11 | ✅ |
+| 문서 SSOT | R12 | ✅ |
 
 ---
 
-## Pending Step 4 — src skeleton (NotImplemented only)
+## Open / Out of Scope
 
-```text
-src/boundary/models.py              # ErrorCode, ERROR_MESSAGES, ErrorResponse
-src/boundary/boundary_validator.py  # validate() → NotImplementedError
-src/boundary/result_formatter.py    # stub
-src/control/solve_magic_square_use_case.py  # execute() + DI
-src/domain/blank_finder.py
-src/domain/missing_number_finder.py
-src/domain/magic_square_validator.py
-src/domain/solver.py
-```
+| ID | 항목 | 비고 |
+|---|---|---|
+| DEF-005 | legacy 커버리지 79% | gate 제외 또는 테스트 추가 |
+| QA-RISK-007 | screen/ cov smoke | omit 정책 적용 중 |
+| QA-RISK-009 | stale docs | R12로 해소 |
+| QA-RISK-010 | Solver type annotation | Low — 후속 |
+| DOMAIN_MAGIC_UNCHECKABLE | AC-15 | 범위 외 (REFACTOR plan) |
 
 ---
 
-## Pending Step 5 — RED tests
+## Historical — Original RED Steps (superseded)
 
-```text
-tests/conftest.py                   # BV-01~06 matrix fixtures
-tests/boundary/test_boundary_validator_size.py   # P0 parametrize
-tests/control/test_use_case_domain_isolation.py  # P1 mock injection
-tests/boundary/test_error_contract.py            # P2 optional
-```
+<details>
+<summary>Pending Step 1~5 (2026-05-29 초기 — 모두 완료됨)</summary>
 
-**Verify RED:**
+- Step 1 legacy/ 이동 — 완료
+- Step 2 Cursor rules — `magicsquare-*.mdc` 적용
+- Step 3 pyproject.toml — dev/gui extras
+- Step 4 src skeleton — GREEN Sprint에서 구현
+- Step 5 RED tests — P0 55+ GM-1 6
+
+</details>
+
+---
+
+## Verify GREEN + REFACTOR
 
 ```bash
 pip install -e ".[dev]"
-pytest tests/boundary tests/control -v   # expect FAIL
+python -m pytest tests/boundary/ tests/control/ tests/entity/ tests/contracts/ -m p0 -v
+python -m pytest tests/test_gm_01_magic_square_golden_master.py -v
 ```
-
----
-
-## ID Quick Reference (README ↔ test_plan)
-
-| README | test_plan | Input |
-|---|---|---|
-| TC-A-01 | TC-FR01-01 / BV-01 | `matrix=None` |
-| TC-A2-01 | TC-FR01-01 | Domain 0-call |
-| TC-A2-02 | — | ResultFormatter 0-call |
-
-Full mapping: [`test_plan.md` §2.2](test_plan.md)
