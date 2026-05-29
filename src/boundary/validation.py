@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from entity.constants import MAX_CELL_VALUE, MIN_CELL_VALUE
+
 
 def is_matrix_4x4(matrix: list[list[int]], order: int) -> bool:
     if len(matrix) != order:
@@ -16,7 +18,7 @@ def count_blanks(matrix: list[list[int]]) -> int:
 def has_invalid_value_range(matrix: list[list[int]]) -> bool:
     for row in matrix:
         for cell in row:
-            if cell != 0 and not (1 <= cell <= 16):
+            if cell != 0 and not (MIN_CELL_VALUE <= cell <= MAX_CELL_VALUE):
                 return True
     return False
 
