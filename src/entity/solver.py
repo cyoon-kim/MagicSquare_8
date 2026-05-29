@@ -5,15 +5,22 @@ from __future__ import annotations
 from copy import deepcopy
 
 from contracts.errors import (
+    DOMAIN_BLANK_COUNT_CODE,
+    DOMAIN_BLANK_COUNT_MESSAGE,
+    DOMAIN_MISSING_COUNT_CODE,
+    DOMAIN_MISSING_COUNT_MESSAGE,
     DOMAIN_NO_MAGIC_ASSIGNMENT_CODE,
     DOMAIN_NO_MAGIC_ASSIGNMENT_MESSAGE,
     ErrorDetail,
     ErrorResponse,
 )
 from entity.blank_finder import BlankFinder
-from entity.exceptions import UnsolvableDomainError
 from entity.magic_square_validator import MagicSquareValidator
 from entity.missing_number_finder import MissingNumberFinder
+
+
+def _domain_error(code: str, message: str) -> ErrorResponse:
+    return ErrorResponse(error=ErrorDetail(code=code, message=message))
 
 
 class Solver:
@@ -25,12 +32,23 @@ class Solver:
         self._validator = MagicSquareValidator()
 
     def solve(self, matrix: list[list[int]]) -> list[int] | ErrorResponse:
+        """Solve two-cell assignment or return a §13 domain error object.
+
+        Args:
+            matrix: Validated 4×4 grid with exactly two blanks.
+
+        Returns:
+            Domain success ``int[6]`` (0-index) or ``ErrorResponse``.
+        """
         blanks = self._blank_finder.find(matrix)
         if len(blanks) != 2:
-            raise UnsolvableDomainError("Expected exactly two blanks")
+            return _domain_error(DOMAIN_BLANK_COUNT_CODE, DOMAIN_BLANK_COUNT_MESSAGE)
         missing = self._missing_finder.find(matrix)
         if len(missing) != 2:
-            raise UnsolvableDomainError("Expected exactly two missing numbers")
+            return _domain_error(
+                DOMAIN_MISSING_COUNT_CODE,
+                DOMAIN_MISSING_COUNT_MESSAGE,
+            )
         attempts = [
             (missing[0], missing[1]),
             (missing[1], missing[0]),
@@ -39,18 +57,10 @@ class Solver:
             payload = self._try_assignment(matrix, blanks, first, second)
             if payload is not None:
                 return payload
-        raise UnsolvableDomainError(DOMAIN_NO_MAGIC_ASSIGNMENT_MESSAGE)
-
-    def solve_or_error(self, matrix: list[list[int]]) -> list[int] | ErrorResponse:
-        try:
-            return self.solve(matrix)
-        except UnsolvableDomainError:
-            return ErrorResponse(
-                error=ErrorDetail(
-                    code=DOMAIN_NO_MAGIC_ASSIGNMENT_CODE,
-                    message=DOMAIN_NO_MAGIC_ASSIGNMENT_MESSAGE,
-                )
-            )
+        return _domain_error(
+            DOMAIN_NO_MAGIC_ASSIGNMENT_CODE,
+            DOMAIN_NO_MAGIC_ASSIGNMENT_MESSAGE,
+        )
 
     def _try_assignment(
         self,

@@ -9,10 +9,8 @@ import pytest
 from boundary.boundary_validator import BoundaryValidator
 from boundary.models import ErrorResponse
 from boundary.result_formatter import ResultFormatter
+from control.factory import build_solve_magic_square_use_case
 from control.solve_magic_square_use_case import SolveMagicSquareUseCase
-from entity.blank_finder import BlankFinder
-from entity.magic_square_validator import MagicSquareValidator
-from entity.missing_number_finder import MissingNumberFinder
 from entity.solver import Solver
 from grids import G3_MATRIX
 from constants import DOMAIN_NO_MAGIC_ASSIGNMENT_CODE
@@ -25,14 +23,7 @@ class TestAc24G3FailureNoSuccessFormat:
 
     def test_ac_24_g3_execute_returns_domain_error_not_list(self) -> None:
         """AC-24 — G3 (TD-07) → ErrorResponse, never int[6]."""
-        use_case = SolveMagicSquareUseCase(
-            boundary_validator=BoundaryValidator(),
-            blank_finder=BlankFinder(),
-            missing_number_finder=MissingNumberFinder(),
-            magic_square_validator=MagicSquareValidator(),
-            solver=Solver(),
-            result_formatter=ResultFormatter(),
-        )
+        use_case = build_solve_magic_square_use_case()
 
         result = use_case.execute(G3_MATRIX)
 
@@ -45,9 +36,6 @@ class TestAc24G3FailureNoSuccessFormat:
         formatter = MagicMock(spec=ResultFormatter)
         use_case = SolveMagicSquareUseCase(
             boundary_validator=BoundaryValidator(),
-            blank_finder=BlankFinder(),
-            missing_number_finder=MissingNumberFinder(),
-            magic_square_validator=MagicSquareValidator(),
             solver=Solver(),
             result_formatter=formatter,
         )

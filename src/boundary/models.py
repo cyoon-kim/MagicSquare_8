@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 from contracts.errors import (
+    DOMAIN_BLANK_COUNT_CODE,
+    DOMAIN_BLANK_COUNT_MESSAGE,
+    DOMAIN_MISSING_COUNT_CODE,
+    DOMAIN_MISSING_COUNT_MESSAGE,
     DOMAIN_NO_MAGIC_ASSIGNMENT_CODE,
     DOMAIN_NO_MAGIC_ASSIGNMENT_MESSAGE,
     ErrorDetail,
@@ -20,6 +24,10 @@ from contracts.errors import (
 )
 
 __all__ = [
+    "DOMAIN_BLANK_COUNT_CODE",
+    "DOMAIN_BLANK_COUNT_MESSAGE",
+    "DOMAIN_MISSING_COUNT_CODE",
+    "DOMAIN_MISSING_COUNT_MESSAGE",
     "DOMAIN_NO_MAGIC_ASSIGNMENT_CODE",
     "DOMAIN_NO_MAGIC_ASSIGNMENT_MESSAGE",
     "ErrorDetail",

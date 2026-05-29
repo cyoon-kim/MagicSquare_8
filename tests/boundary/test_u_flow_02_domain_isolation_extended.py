@@ -9,9 +9,6 @@ import pytest
 from boundary.boundary_validator import BoundaryValidator
 from boundary.result_formatter import ResultFormatter
 from control.solve_magic_square_use_case import SolveMagicSquareUseCase
-from entity.blank_finder import BlankFinder
-from entity.magic_square_validator import MagicSquareValidator
-from entity.missing_number_finder import MissingNumberFinder
 from entity.solver import Solver
 from grids import G0_MATRIX
 
@@ -20,9 +17,6 @@ def _build_use_case_with_mocks() -> tuple[SolveMagicSquareUseCase, MagicMock]:
     solver = MagicMock(spec=Solver)
     use_case = SolveMagicSquareUseCase(
         boundary_validator=BoundaryValidator(),
-        blank_finder=BlankFinder(),
-        missing_number_finder=MissingNumberFinder(),
-        magic_square_validator=MagicSquareValidator(),
         solver=solver,
         result_formatter=ResultFormatter(),
     )
@@ -40,7 +34,7 @@ class TestUFlow02DomainIsolationExtended:
 
         use_case.execute(None)
 
-        solver.solve_or_error.assert_not_called()
+        solver.solve.assert_not_called()
 
     def test_u_flow_02_invalid_size_solver_never_called(self) -> None:
         use_case, solver = _build_use_case_with_mocks()
@@ -48,14 +42,14 @@ class TestUFlow02DomainIsolationExtended:
 
         use_case.execute(matrix)
 
-        solver.solve_or_error.assert_not_called()
+        solver.solve.assert_not_called()
 
     def test_u_flow_02_wrong_blank_count_solver_never_called(self) -> None:
         use_case, solver = _build_use_case_with_mocks()
 
         use_case.execute(G0_MATRIX)
 
-        solver.solve_or_error.assert_not_called()
+        solver.solve.assert_not_called()
 
     def test_u_flow_02_value_range_invalid_solver_never_called(self) -> None:
         use_case, solver = _build_use_case_with_mocks()
@@ -68,7 +62,7 @@ class TestUFlow02DomainIsolationExtended:
 
         use_case.execute(matrix)
 
-        solver.solve_or_error.assert_not_called()
+        solver.solve.assert_not_called()
 
     def test_u_flow_02_duplicate_non_zero_solver_never_called(self) -> None:
         use_case, solver = _build_use_case_with_mocks()
@@ -81,4 +75,4 @@ class TestUFlow02DomainIsolationExtended:
 
         use_case.execute(matrix)
 
-        solver.solve_or_error.assert_not_called()
+        solver.solve.assert_not_called()

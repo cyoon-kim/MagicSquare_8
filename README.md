@@ -16,8 +16,8 @@ Boundary에서 입력을 검증하고, Domain에서 조합을 시도한 뒤, 성
 |------|------|
 | **도메인** | 4×4 마방진 두 칸 완성 (FR-02~05a) |
 | **아키텍처** | ECB — `boundary → control → entity` |
-| **현재 단계** | REFACTOR 진행 중 (item 4 슬라이스 B 완료 · 7항목 중 4완료) |
-| **다음 단계** | 슬라이스 C (R5+R6 Domain·UseCase) |
+| **현재 단계** | REFACTOR 진행 중 (item 5 슬라이스 C 완료 · 7항목 중 5완료) |
+| **다음 단계** | 코드·테스트 위생 (R8~R11) |
 | **브랜치** | `refactor/refactor` (리팩터 작업) |
 
 ---
@@ -185,11 +185,11 @@ MagicSquare_XX/
 | 2 | **선행 게이트** — defect_list Close, AC-22 RED, NFR-04/AC-24, Boundary cov 정책 | §14 · QA-RISK-007~009 | ✅ |
 | 3 | **슬라이스 A — ECB 구조** — `src/contracts/`, control ports, composition factory; AV-01~03 | R1 → R2/R3 | ✅ |
 | 4 | **슬라이스 B — Boundary 출력** — `ResultFormatter` FR-05b, int[6] 검증, +1 index 이동 | R4 (AC-22 GREEN) | ✅ |
-| 5 | **슬라이스 C — Domain·UseCase** — Solver 단일 error API, §13 `DOMAIN_*`, dead orchestration 제거 | R5 + R6 | ⬜ |
+| 5 | **슬라이스 C — Domain·UseCase** — Solver 단일 error API, §13 `DOMAIN_*`, dead orchestration 제거 | R5 + R6 | ✅ |
 | 6 | **코드·테스트 위생** — conftest fixture, docstring, assertion 정리, `print`→logging | R8 + R9 + R10 + R11 | ⬜ |
 | 7 | **문서 SSOT 동기화** — `contracts.md`↔`models.py`, test_plan·checklist·coverage_guide | R12 + §13 | ⬜ |
 
-**진행:** 4 / 7 완료
+**진행:** 5 / 7 완료
 
 #### 체크리스트 (merge 시 `[x]` 갱신)
 

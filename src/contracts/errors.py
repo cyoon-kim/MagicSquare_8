@@ -16,6 +16,10 @@ DOMAIN_NO_MAGIC_ASSIGNMENT_CODE = "DOMAIN_NO_MAGIC_ASSIGNMENT"
 DOMAIN_NO_MAGIC_ASSIGNMENT_MESSAGE = (
     "No valid magic-square assignment exists for the two missing numbers."
 )
+DOMAIN_BLANK_COUNT_CODE = "DOMAIN_BLANK_COUNT"
+DOMAIN_BLANK_COUNT_MESSAGE = "Domain blank count invariant violated."
+DOMAIN_MISSING_COUNT_CODE = "DOMAIN_MISSING_COUNT"
+DOMAIN_MISSING_COUNT_MESSAGE = "Domain missing number count invariant violated."
 OUTPUT_FORMAT_INVALID_CODE = "OUTPUT_FORMAT_INVALID"
 OUTPUT_FORMAT_INVALID_MESSAGE = (
     "Output must be an int array of length 6 with 1-index coordinates."

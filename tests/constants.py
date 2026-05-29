@@ -15,3 +15,7 @@ OUTPUT_FORMAT_INVALID_MESSAGE: str = (
     "Output must be an int array of length 6 with 1-index coordinates."
 )
 DOMAIN_NO_MAGIC_ASSIGNMENT_CODE: str = "DOMAIN_NO_MAGIC_ASSIGNMENT"
+DOMAIN_BLANK_COUNT_CODE: str = "DOMAIN_BLANK_COUNT"
+DOMAIN_BLANK_COUNT_MESSAGE: str = "Domain blank count invariant violated."
+DOMAIN_MISSING_COUNT_CODE: str = "DOMAIN_MISSING_COUNT"
+DOMAIN_MISSING_COUNT_MESSAGE: str = "Domain missing number count invariant violated."
