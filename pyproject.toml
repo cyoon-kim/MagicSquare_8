@@ -11,6 +11,12 @@ dev = [
     "pytest-cov>=5.0",
     "pydantic>=2.0",
 ]
+gui = [
+    "PyQt6>=6.6",
+]
+
+[project.scripts]
+magicsquare-screen = "boundary.screen.app:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -22,6 +28,7 @@ markers = [
     "boundary: Track A boundary layer tests",
     "control: Track A-2 control layer tests",
     "domain: Track B domain layer tests",
+    "golden_master: GM-1 approval / golden master regression tests",
 ]
 
 [tool.coverage.run]

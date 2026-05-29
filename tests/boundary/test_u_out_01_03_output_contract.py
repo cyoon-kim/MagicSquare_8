@@ -1,17 +1,28 @@
-"""Track A — U-OUT-01~03 output contract RED skeletons (FR-05b / FR-06 success path).
-
-Domain may be stubbed via Control DI in Full RED; skeleton uses pytest.fail only.
-"""
+"""Track A — U-OUT-01~03 output contract (FR-05b / FR-06 success path)."""
 
 from __future__ import annotations
 
 import pytest
 
-# from control.solve_magic_square_use_case import SolveMagicSquareUseCase
-# from boundary.input_validator import InputValidator
-# from boundary.result_formatter import ResultFormatter
-# from entity.solver import Solver
-# from unittest.mock import MagicMock
+from boundary.boundary_validator import BoundaryValidator
+from boundary.result_formatter import ResultFormatter
+from control.solve_magic_square_use_case import SolveMagicSquareUseCase
+from entity.blank_finder import BlankFinder
+from entity.magic_square_validator import MagicSquareValidator
+from entity.missing_number_finder import MissingNumberFinder
+from entity.solver import Solver
+from grids import G1_EXPECTED_STEP_A, G1_MATRIX
+
+
+def _build_use_case() -> SolveMagicSquareUseCase:
+    return SolveMagicSquareUseCase(
+        boundary_validator=BoundaryValidator(),
+        blank_finder=BlankFinder(),
+        missing_number_finder=MissingNumberFinder(),
+        magic_square_validator=MagicSquareValidator(),
+        solver=Solver(),
+        result_formatter=ResultFormatter(),
+    )
 
 
 @pytest.mark.boundary
@@ -20,22 +31,25 @@ class TestUOut01Through03OutputContract:
     """External int[6] success contract — length, 1-index coords, G1 payload."""
 
     def test_u_out_01_success_result_length_is_six(self) -> None:
-        """U-OUT-01 — success response is int[6] (BR-13, AC-19)."""
-        # Given: G1 matrix passes Boundary validation
-        # use_case = SolveMagicSquareUseCase(...)  # Control + optional Domain mocks
-        # When: use_case.execute(g1_matrix)
-        pytest.fail("RED: U-OUT-01 — success result length must be 6")
+        use_case = _build_use_case()
+
+        result = use_case.execute(G1_MATRIX)
+
+        assert isinstance(result, list)
+        assert len(result) == 6
 
     def test_u_out_02_coordinates_are_one_indexed_in_range(self) -> None:
-        """U-OUT-02 — r,c in [1,4] for G1 (BR-12, AC-20)."""
-        # Given: G1 matrix
-        # When: use_case.execute(g1_matrix)
-        # Then (Full RED): result[0],result[1],result[3],result[4] in 1..4
-        pytest.fail("RED: U-OUT-02 — G1 output coords are 1-index in [1,4]")
+        use_case = _build_use_case()
+
+        result = use_case.execute(G1_MATRIX)
+
+        assert isinstance(result, list)
+        for idx in (0, 1, 3, 4):
+            assert 1 <= result[idx] <= 4
 
     def test_u_out_03_g1_step_a_success_payload(self) -> None:
-        """U-OUT-03 — G1 expected [2,2,7,3,3,10] (Step A, I8)."""
-        # Given: G1 matrix
-        # When: use_case.execute(g1_matrix)
-        # Then (Full RED): [2, 2, 7, 3, 3, 10]
-        pytest.fail("RED: U-OUT-03 — G1 Step A success returns [2,2,7,3,3,10]")
+        use_case = _build_use_case()
+
+        result = use_case.execute(G1_MATRIX)
+
+        assert result == G1_EXPECTED_STEP_A
