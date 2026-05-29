@@ -1,0 +1,43 @@
+---
+description: MagicSquare TDD 단계 및 테스트 전략 규칙
+alwaysApply: true
+---
+
+# TDD and Testing
+
+## Test Framework and Baseline
+
+- Framework: `pytest`
+- Pattern: `AAA (Arrange-Act-Assert)`
+- Coverage minimum: `80%`
+- Test naming: `test_` prefix required
+
+## Fixture Policy
+
+- 기본 fixture scope는 `function`으로 둔다.
+- `module/session` scope는 비용이 큰 공용 리소스에 한해 제한적으로 사용한다.
+- 테스트 간 상태 공유가 생기지 않도록 fixture를 설계한다.
+
+## RED Phase
+
+- 구현 전에 실패 테스트를 먼저 작성한다.
+- 실패 원인이 요구사항 검증과 직접 연결되어야 한다.
+- 실패 로그를 확인한 후 GREEN으로 진행한다.
+
+## GREEN Phase
+
+- RED 테스트를 통과시키는 최소 코드만 작성한다.
+- 변경 범위를 현재 실패 테스트와 직접 관련된 부분으로 제한한다.
+- 구조 개선 목적의 리팩터링은 이 단계에서 수행하지 않는다.
+
+## REFACTOR Phase
+
+- 기능/출력 계약은 유지하고 구조만 개선한다.
+- 리팩터링 중에도 전체 테스트 통과 상태를 유지한다.
+- 커버리지는 기존 수준 이상으로 유지한다.
+
+## AI Behavior During Implementation
+
+- ECB 레이어 경계를 위반하는 코드를 생성하지 않는다.
+- TDD 단계 목적(RED/GREEN/REFACTOR)에 맞지 않는 변경을 피한다.
+- 코드 작성 후 테스트 실행과 커버리지 기준 충족 여부를 점검한다.

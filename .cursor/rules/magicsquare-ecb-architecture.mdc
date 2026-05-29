@@ -1,0 +1,34 @@
+---
+description: MagicSquare ECB 아키텍처와 의존성 규칙
+alwaysApply: true
+---
+
+# ECB Architecture
+
+## Layer Responsibilities
+
+- `boundary`: UI/API/CLI 등 외부 입출력 담당
+- `control`: 유스케이스/비즈니스 흐름 담당
+- `entity`: 도메인 데이터와 핵심 규칙 담당
+
+## Dependency Direction
+
+- `boundary -> control`
+- `control -> entity`
+- `entity -> (none)`
+
+## Dependency Rules
+
+- boundary는 entity에 직접 의존하지 않는다.
+- entity는 boundary/control를 참조하지 않는다.
+- 모든 흐름은 boundary에서 시작해 control을 거쳐 entity로 이동한다.
+
+## Recommended Structure
+
+- `src/boundary/`
+- `src/control/`
+- `src/entity/`
+- `tests/boundary/`
+- `tests/control/`
+- `tests/entity/`
+- `tests/integration/`
