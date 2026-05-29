@@ -11,6 +11,9 @@ dev = [
     "pytest-cov>=5.0",
     "pydantic>=2.0",
 ]
+gui = [
+    "PyQt6>=6.6",
+]
 
 [project.scripts]
 magicsquare-screen = "boundary.screen.app:main"

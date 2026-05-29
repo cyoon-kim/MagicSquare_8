@@ -88,6 +88,19 @@
 
 ---
 
+## GUI 실행 (PyQt6)
+
+```powershell
+cd MagicSquare_XX
+pip install -e ".[gui,dev]"
+python -m boundary.screen.app
+```
+
+- 기본 격자: PRD TD-01 (G1). **풀기** → 성공 시 `결과 (r1, c1, n1, r2, c2, n2): …`, 실패 시 `오류: …`
+- CLI: `python -m boundary.screen.app --verify` (`matrix=None` 경계 검증)
+
+---
+
 ## 저장소 구조
 
 ```
@@ -101,6 +114,7 @@ MagicSquare_XX/
 │   └── defect_list.md
 ├── src/
 │   ├── boundary/               # BoundaryValidator, ResultFormatter
+│   │   └── screen/             # PyQt6 GUI (예제 패턴: QSpinBox + 풀기)
 │   ├── control/                # SolveMagicSquareUseCase
 │   └── entity/                 # Domain Logic (FR-02~05a) — 실습 ECB Entity
 ├── tests/
