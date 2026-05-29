@@ -197,7 +197,7 @@ python -m pytest --cov=src --cov-report=term-missing --cov-fail-under=80
 
 ### 결함 목록 연결
 
-- [ ] [`docs/defect_list.md`](docs/defect_list.md) 발견 결함 기록
+- [x] [`docs/defect_list.md`](docs/defect_list.md) 발견 결함 기록 (DEF-001~006, 2026-05-29)
 - [ ] 결함 수정 후 회귀 테스트 통과
 
 ---
