@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from boundary.models import ErrorResponse
+from contracts.errors import ErrorResponse
 
 
 class ResultFormatter:

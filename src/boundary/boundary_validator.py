@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from boundary.models import (
+from contracts.errors import (
     ErrorDetail,
     ErrorResponse,
     INPUT_BLANK_COUNT_INVALID_CODE,

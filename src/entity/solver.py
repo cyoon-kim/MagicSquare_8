@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from boundary.models import (
+from contracts.errors import (
     DOMAIN_NO_MAGIC_ASSIGNMENT_CODE,
     DOMAIN_NO_MAGIC_ASSIGNMENT_MESSAGE,
     ErrorDetail,

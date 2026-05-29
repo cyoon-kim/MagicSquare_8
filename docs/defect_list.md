@@ -16,8 +16,8 @@
 | ID | Severity | AC ID | 재현 절차 | 기대값 | 실제값 | 근본 원인 | 수정 요약 |
 |---|---|---|---|---|---|---|---|
 | DEF-005 | Medium | — | 1. `python -m pytest tests/legacy/ --cov=legacy --cov-fail-under=80` | 전역 gate **80%+** (실습 §6) | `Coverage failure: total of 79% is less than fail-under=80` (테스트 5 passed) | `legacy/entity/user.py` 일부 분기 미커버 (lines 38, 50, 82-84, 104) | `activate()` 등 미호출 경로 테스트 추가 또는 legacy 범위에서 gate 제외 |
-| QA-RISK-001 | Critical | NFR-06 | `grep "from boundary" src/entity/` | entity → (none) | `solver.py`가 `boundary.models` import | ECB 위반 — 오류 DTO가 boundary에 있음 | R1: `src/contracts/` 분리 (refactor-plan §6 R1) |
-| QA-RISK-002 | Critical | NFR-06 | `grep "from entity" src/boundary/screen/app.py` | boundary → control → entity | `app.py`가 entity 직접 import | composition root가 entity wire | R3: factory 분리 (refactor-plan §6 R3) |
+| QA-RISK-001 | Critical | NFR-06 | `grep "from boundary" src/entity/` | entity → (none) | ~~solver.py boundary.models~~ | ECB 위반 | **Close (R1):** `contracts.errors` SSOT |
+| QA-RISK-002 | Critical | NFR-06 | `grep "from entity" src/boundary/screen/app.py` | boundary → control → entity | ~~app.py entity wire~~ | composition root | **Close (R3):** `control.factory` |
 | QA-RISK-003 | High | AC-22 | `ResultFormatter.format()` 호출 | len≠6 → `OUTPUT_FORMAT_INVALID` | pass-through만 수행 | FR-05b 미구현 | R4 + RED-BND-OUT-001/002 |
 | QA-RISK-004 | High | AC-19~21 | Solver 성공 payload 좌표 | Domain 0-index, Boundary +1 | `solver.py:68` 1-index 반환 | 레이어 책임 혼재 | R4: Formatter가 +1 담당 |
 | QA-RISK-005 | High | FR-06 | UseCase `execute()` 호출 | blank/missing finder 결과 활용 | find() 결과 버림, validator 미사용 | dead orchestration | R6 |
@@ -62,7 +62,9 @@ pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85
 
 - [x] DEF-001~004 Close (GREEN 완료)
 - [x] DEF-006 Close (entity 테스트 존재)
-- [ ] QA-RISK-001~011 — refactor-plan 슬라이스별 Close
+- [ ] QA-RISK-003~011 — refactor-plan 슬라이스별 Close
+- [x] QA-RISK-001 Close (R1 contracts)
+- [x] QA-RISK-002 Close (R3 factory)
 - [x] AC-22 RED-BND-OUT-001/002 작성 (R4 선행) — `red_bnd_out` marker, R4 전 FAIL 예상
 - [x] NFR-04 matrix 불변성 테스트 — `test_nfr_04_matrix_immutability.py`
 - [x] AC-24 UseCase G3 → ErrorResponse — `test_ac_24_g3_failure_no_success_format.py`

@@ -1,6 +1,4 @@
-"""Boundary error response models — re-exports from contracts (backward compatible)."""
-
-from __future__ import annotations
+"""Shared cross-layer contracts (error DTO, §13 codes)."""
 
 from contracts.errors import (
     DOMAIN_NO_MAGIC_ASSIGNMENT_CODE,

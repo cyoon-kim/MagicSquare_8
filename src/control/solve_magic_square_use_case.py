@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from boundary.boundary_validator import BoundaryValidator
-from boundary.models import ErrorResponse
-from boundary.result_formatter import ResultFormatter
+from contracts.errors import ErrorResponse
+from control.ports import MatrixValidatorPort, ResultFormatterPort
 from entity.blank_finder import BlankFinder
 from entity.magic_square_validator import MagicSquareValidator
 from entity.missing_number_finder import MissingNumberFinder
@@ -16,12 +15,12 @@ class SolveMagicSquareUseCase:
 
     def __init__(
         self,
-        boundary_validator: BoundaryValidator,
+        boundary_validator: MatrixValidatorPort,
         blank_finder: BlankFinder,
         missing_number_finder: MissingNumberFinder,
         magic_square_validator: MagicSquareValidator,
         solver: Solver,
-        result_formatter: ResultFormatter,
+        result_formatter: ResultFormatterPort,
     ) -> None:
         self._boundary_validator = boundary_validator
         self._blank_finder = blank_finder

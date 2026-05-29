@@ -5,14 +5,12 @@ from __future__ import annotations
 import difflib
 from pathlib import Path
 
-from boundary.boundary_validator import BoundaryValidator
-from boundary.models import ErrorResponse
-from boundary.result_formatter import ResultFormatter
+from contracts.errors import ErrorResponse
+from control.factory import build_solve_magic_square_use_case
 from control.solve_magic_square_use_case import SolveMagicSquareUseCase
 from entity.blank_finder import BlankFinder
 from entity.magic_square_validator import MagicSquareValidator
 from entity.missing_number_finder import MissingNumberFinder
-from entity.solver import Solver
 
 from golden_master_scenarios import (
     GOLDEN_MASTER_SCENARIOS,
@@ -27,14 +25,7 @@ SECTION_SEPARATOR = "________________________________________"
 
 def build_use_case() -> SolveMagicSquareUseCase:
     """Real orchestration stack for end-to-end golden master capture."""
-    return SolveMagicSquareUseCase(
-        boundary_validator=BoundaryValidator(),
-        blank_finder=BlankFinder(),
-        missing_number_finder=MissingNumberFinder(),
-        magic_square_validator=MagicSquareValidator(),
-        solver=Solver(),
-        result_formatter=ResultFormatter(),
-    )
+    return build_solve_magic_square_use_case()
 
 
 def format_grid(grid: list[list[int]]) -> str:
