@@ -1,5 +1,7 @@
 # Magic Square (4x4) — Dual-Track UI + Logic TDD / Clean Architecture 보고서
 
+> **Superseded (partial):** Input validation location — authoritative source is [`docs/PRD_MagicSquare.md`](../docs/PRD_MagicSquare.md) **FR-01** (`BoundaryValidator` in Boundary layer). Report §1.4 `validateInput` as Domain API is deprecated. See [`docs/contracts.md`](../docs/contracts.md).
+
 ## 문서 목적
 - 알고리즘 구현이 아니라 **레이어 분리**, **계약 기반 테스트**, **리팩토링 안전성** 훈련을 위한 설계 산출물 고정
 - 고정 입력/출력 계약을 기준으로 Domain/UI/Data/Integration 검증 기준 정의
