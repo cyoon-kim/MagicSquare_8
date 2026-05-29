@@ -29,6 +29,7 @@ markers = [
     "control: Track A-2 control layer tests",
     "domain: Track B domain layer tests",
     "golden_master: GM-1 approval / golden master regression tests",
+    "red_bnd_out: AC-22 RED tests — fail until R4 ResultFormatter (excluded from p0 gate)",
 ]
 
 [tool.coverage.run]

@@ -2,8 +2,8 @@
 
 4×4 마방진(Magic Square) **두 칸 완성**을 다루는 TDD · ECB 아키텍처 학습 프로젝트입니다.
 
-**현재 단계:** **GREEN 완료** → **REFACTOR 준비**  
-Track A/B 구현·골든 마스터·PyQt6 Screen까지 완료했으며, ECB 의존 정리와 PRD 계약 보완을 위한 리팩터링 계획을 수립한 상태입니다.
+**현재 단계:** **REFACTOR 진행 중** (R7 완료)  
+Track A/B 구현·골든 마스터·PyQt6 Screen까지 완료했으며, ECB 의존 정리와 PRD 계약 보완 리팩터링을 진행 중입니다.
 
 ---
 
@@ -16,8 +16,8 @@ Boundary에서 입력을 검증하고, Domain에서 조합을 시도한 뒤, 성
 |------|------|
 | **도메인** | 4×4 마방진 두 칸 완성 (FR-02~05a) |
 | **아키텍처** | ECB — `boundary → control → entity` |
-| **현재 단계** | GREEN (43 P0 + GM-1) · REFACTOR 계획 수립 |
-| **다음 단계** | AC-22 RED → 슬라이스 A (R1 contracts → R2/R3) |
+| **현재 단계** | REFACTOR 진행 중 (item 2 선행 게이트 완료 · 7항목 중 2완료) |
+| **다음 단계** | 슬라이스 A (R1 contracts → R2/R3) |
 | **브랜치** | `refactor/refactor` (리팩터 작업) |
 
 ---
@@ -171,18 +171,53 @@ MagicSquare_XX/
 - [x] PyQt6 Screen ([Report/12](Report/12_MagicSquare_PyQt6_Screen_Migration_Report.md))
 - [x] REFACTOR 계획 · QA 리스크 정리 ([Report/13](Report/13_MagicSquare_CodeReview_QA_RefactorPlan_Report.md))
 
-### REFACTOR Sprint (진행 예정)
+### REFACTOR Sprint
 
 리팩터 merge마다 [`docs/refactor-plan.md`](docs/refactor-plan.md) §10 회귀 gate 실행.
 
-| 우선순위 | 항목 | 참조 |
-|----------|------|------|
-| 1 | AC-22 RED (RED-BND-OUT-001/002) | R4 선행 |
-| 2 | NFR-04 matrix 불변성 · AC-24 UseCase G3 | QA 공백 |
-| 3 | 슬라이스 A: R1 contracts → R2 ports → R3 factory | ECB 정리 |
-| 4 | 슬라이스 B: R4 FR-05b ResultFormatter | AC-22 GREEN |
-| 5 | 슬라이스 C: R5 Solver API · R6 UseCase chain | §13 오류 코드 |
-| 6 | Boundary cov 정책 (`screen/` omit vs smoke) | QA-RISK-007 |
+> **통합 기준:** 원본 백로그 R1~R12 + §14 선행 작업을 **7개 체크리스트**로 묶었습니다.  
+> 상세 ID·수용 기준·QA 테스트는 [`docs/refactor-plan.md`](docs/refactor-plan.md) (REF-MSQ-001) 참조.
+
+| # | 항목 | 포함 (원본 ID) | 상태 |
+|---|------|----------------|------|
+| 1 | **숫자 상수 SSOT** — `validation.py` 하드코딩 → `entity.constants` | R7 | ✅ |
+| 2 | **선행 게이트** — defect_list Close, AC-22 RED, NFR-04/AC-24, Boundary cov 정책 | §14 · QA-RISK-007~009 | ✅ |
+| 3 | **슬라이스 A — ECB 구조** — `src/contracts/`, control ports, composition factory; AV-01~03 | R1 → R2/R3 | ⬜ |
+| 4 | **슬라이스 B — Boundary 출력** — `ResultFormatter` FR-05b, int[6] 검증, +1 index 이동 | R4 (AC-22 GREEN) | ⬜ |
+| 5 | **슬라이스 C — Domain·UseCase** — Solver 단일 error API, §13 `DOMAIN_*`, dead orchestration 제거 | R5 + R6 | ⬜ |
+| 6 | **코드·테스트 위생** — conftest fixture, docstring, assertion 정리, `print`→logging | R8 + R9 + R10 + R11 | ⬜ |
+| 7 | **문서 SSOT 동기화** — `contracts.md`↔`models.py`, test_plan·checklist·coverage_guide | R12 + §13 | ⬜ |
+
+**진행:** 2 / 7 완료
+
+#### 체크리스트 (merge 시 `[x]` 갱신)
+
+- [x] **1. R7** — `validation.py` `MIN/MAX_CELL_VALUE` SSOT (`refactor/boundary`, `d539045`)
+- [x] **2. 선행 게이트**
+  - [x] `docs/defect_list.md` — DEF-001~004 Close, QA-RISK 반영
+  - [x] AC-22 RED — `RED-BND-OUT-001/002` (`red_bnd_out` marker, R4 전 FAIL)
+  - [x] NFR-04 matrix 불변성 · AC-24 UseCase G3 격리 테스트
+  - [x] Boundary cov 정책 — `screen/` omit (`docs/coverage_guide.md` §4)
+- [ ] **3. 슬라이스 A (R1→R2/R3)** — ECB 의존 정리
+  - [ ] R1 `src/contracts/errors.py` — 공유 DTO + §13 코드 (entity→boundary 차단)
+  - [ ] R2 `control/ports.py` — Protocol + mock use case 테스트
+  - [ ] R3 `control/factory.py` — `app.py` entity 직접 wire 제거
+- [ ] **4. 슬라이스 B (R4)** — Boundary 출력 계약
+  - [ ] `ResultFormatter` int[6] 검증 · `OUTPUT_FORMAT_INVALID`
+  - [ ] Solver 0-index 내부 · Formatter +1 변환 (QA-RISK-004)
+  - [ ] GM-TC-01/02 출력 불변
+- [ ] **5. 슬라이스 C (R5+R6)** — Domain API · 오케스트레이션
+  - [ ] R5 Solver 실패 API 단일화 — error 객체만, `DOMAIN_BLANK/MISSING_COUNT`
+  - [ ] R6 UseCase dead `find()` 제거 · validator DI 정리 (call-count spy 선행)
+- [ ] **6. 코드·테스트 위생 (R8~R11)**
+  - [ ] R8 `build_use_case()` → conftest fixture
+  - [ ] R9 public API Google docstring
+  - [ ] R10 중복 assertion 정리 (cosmetic)
+  - [ ] R11 `app.py` `print()` → `logging`
+- [ ] **7. 문서 SSOT (R12 + §13)**
+  - [ ] `docs/contracts.md` ↔ `src/boundary/models.py` parity
+  - [ ] `docs/test_plan.md` · `docs/red_implementation_checklist.md` 상태 갱신
+  - [ ] `docs/coverage_guide.md` boundary cov note
 
 ### 알려진 이슈 (Open)
 

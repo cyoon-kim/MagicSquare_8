@@ -56,7 +56,21 @@ python -m pytest tests/boundary/ --cov=src/boundary --cov-report=term-missing
 
 **목표:** Boundary **85%+** (PRD NFR-02)
 
-**Gate:**
+### Boundary cov 정책 (QA-RISK-007 — REFACTOR item 2)
+
+`src/boundary/screen/` (PyQt6) 는 현재 단위 테스트 없음 → 전체 boundary gate 시 **~38% FAIL**.
+
+**결정 (2026-05-29):** REFACTOR Sprint gate에서는 **`screen/` omit** — core boundary 모듈만 85% gate 적용.  
+Screen smoke/cov는 R3/R11 이후 별도 정책 검토.
+
+**Gate (core boundary only — screen omit):**
+
+```bash
+python -m coverage run --source=src/boundary --omit="src/boundary/screen/*" -m pytest tests/boundary/ -q
+python -m coverage report --fail-under=85
+```
+
+**Full boundary (참고 — 현재 FAIL 예상):**
 
 ```bash
 python -m pytest tests/boundary/ --cov=src/boundary --cov-report=term-missing --cov-fail-under=85

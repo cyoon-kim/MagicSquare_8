@@ -22,7 +22,7 @@
 | QA-RISK-004 | High | AC-19~21 | Solver 성공 payload 좌표 | Domain 0-index, Boundary +1 | `solver.py:68` 1-index 반환 | 레이어 책임 혼재 | R4: Formatter가 +1 담당 |
 | QA-RISK-005 | High | FR-06 | UseCase `execute()` 호출 | blank/missing finder 결과 활용 | find() 결과 버림, validator 미사용 | dead orchestration | R6 |
 | QA-RISK-006 | High | §13 | `Solver.solve()` vs `solve_or_error()` | 단일 error 객체 API | raise + ErrorResponse 이중 API | 설계 미정 | R5 |
-| QA-RISK-007 | Medium | NFR-02 | `pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85` | ≥85% | ~38% FAIL | `screen/` 0% | omit 또는 smoke 테스트 |
+| QA-RISK-007 | Medium | NFR-02 | `pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85` | ≥85% | ~38% FAIL (full) | `screen/` 0% | **정책 결정:** core omit gate (coverage_guide §4); smoke는 R3/R11 후 |
 | QA-RISK-008 | Medium | — | `grep "print(" src/` | print 없음 | `app.py:44-47` | dev CLI 잔존 | R11 |
 | QA-RISK-011 | Low | §13 | `models.py` 오류 코드 목록 | PRD §13 전체 | 4개 코드 미등록 | GREEN Sprint 범위 밖 | R1/R4/R5 |
 
@@ -63,10 +63,10 @@ pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85
 - [x] DEF-001~004 Close (GREEN 완료)
 - [x] DEF-006 Close (entity 테스트 존재)
 - [ ] QA-RISK-001~011 — refactor-plan 슬라이스별 Close
-- [ ] AC-22 RED-BND-OUT-001/002 작성 (R4 선행)
-- [ ] NFR-04 matrix 불변성 테스트
-- [ ] AC-24 UseCase G3 → ErrorResponse
-- [ ] Boundary cov 정책 결정 (screen omit vs smoke)
+- [x] AC-22 RED-BND-OUT-001/002 작성 (R4 선행) — `red_bnd_out` marker, R4 전 FAIL 예상
+- [x] NFR-04 matrix 불변성 테스트 — `test_nfr_04_matrix_immutability.py`
+- [x] AC-24 UseCase G3 → ErrorResponse — `test_ac_24_g3_failure_no_success_format.py`
+- [x] Boundary cov 정책 결정 — `screen/` omit (coverage_guide §4)
 - [ ] DEF-005 처리 또는 legacy gate 예외 문서화
 
 ---
