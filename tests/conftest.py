@@ -10,10 +10,14 @@ import pytest
 
 ROOT: Path = Path(__file__).resolve().parents[1]
 SRC_PATH: Path = ROOT / "src"
+TESTS_PATH: Path = Path(__file__).resolve().parent
 LEGACY_PATH: Path = ROOT / "legacy"
 
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
+
+if str(TESTS_PATH) not in sys.path:
+    sys.path.insert(0, str(TESTS_PATH))
 
 if str(LEGACY_PATH) not in sys.path:
     sys.path.insert(0, str(LEGACY_PATH))

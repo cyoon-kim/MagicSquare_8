@@ -1,44 +1,59 @@
-"""Track B — D-SOL-01~04 two-cell solver RED skeletons (FR-05a).
-
-Domain Mock forbidden. D-SOL-02 uses G2 placeholder until Report/09 finalizes G2.
-"""
+"""Track B — D-SOL-01~04 two-cell solver (FR-05a)."""
 
 from __future__ import annotations
 
 import pytest
 
-# from entity.solver import Solver
-# from control.two_cell_solver import TwoCellSolver
-# from entity.services.two_cell_solver import solution
+from boundary.models import DOMAIN_NO_MAGIC_ASSIGNMENT_CODE, ErrorResponse
+from entity.exceptions import UnsolvableDomainError
+from entity.solver import Solver
+from grids import G0_MATRIX, G1_EXPECTED_STEP_A, G1_MATRIX, G2_MATRIX, G3_MATRIX
 
 
 @pytest.mark.domain
 @pytest.mark.p0
 class TestDSol01Through04TwoCellSolver:
-    """D-SOL — solution(matrix) -> int[6] 1-index or domain failure."""
+    """D-SOL — Solver.solve -> int[6] 1-index or domain failure."""
 
     def test_d_sol_01_g1_step_a_success_int_six(self) -> None:
-        """D-SOL-01 — G1 Step A [2,2,7,3,3,10]."""
-        # Given: G1_MATRIX
-        # solver = Solver()
-        # When: solver.solve(g1_matrix, ...)
-        pytest.fail("RED: D-SOL-01 — G1 Step A returns [2,2,7,3,3,10]")
+        solver = Solver()
+
+        result = solver.solve(G1_MATRIX)
+
+        assert result == G1_EXPECTED_STEP_A
 
     def test_d_sol_02_g2_step_b_reverse_success(self) -> None:
-        """D-SOL-02 — G2 Step B success (G2 TBD)."""
-        # Given: G2_MATRIX (PRD TD-02 — TBD in conftest)
-        # When: solution(g2_matrix)
-        pytest.fail("RED: D-SOL-02 — G2 TBD")
+        solver = Solver()
+
+        result = solver.solve(G2_MATRIX)
+
+        assert result == [1, 1, 16, 1, 2, 3]
 
     def test_d_sol_03_g3_dual_fail_unsolvable(self) -> None:
-        """D-SOL-03 — G3 both attempts fail."""
-        # Given: G3_MATRIX (PRD TD-07)
-        # When: solution(g3_matrix)
-        # Then (Full RED): UnsolvableDomainError / DOMAIN_NO_MAGIC_ASSIGNMENT
-        pytest.fail("RED: D-SOL-03 — G3 dual fail UnsolvableDomainError")
+        solver = Solver()
+
+        with pytest.raises(UnsolvableDomainError):
+            solver.solve(G3_MATRIX)
+
+    def test_d_sol_03_solve_or_error_returns_domain_error(self) -> None:
+        solver = Solver()
+
+        result = solver.solve_or_error(G3_MATRIX)
+
+        assert isinstance(result, ErrorResponse)
+        assert result.error.code == DOMAIN_NO_MAGIC_ASSIGNMENT_CODE
+
+    def test_d_sol_blank_count_not_two_raises(self) -> None:
+        solver = Solver()
+        matrix = [row[:] for row in G0_MATRIX]
+
+        with pytest.raises(UnsolvableDomainError):
+            solver.solve(matrix)
 
     def test_d_sol_04_g1_result_length_six(self) -> None:
-        """D-SOL-04 — solution length 6 on G1."""
-        # Given: G1_MATRIX
-        # When: solution(g1_matrix)
-        pytest.fail("RED: D-SOL-04 — G1 solution length 6")
+        solver = Solver()
+
+        result = solver.solve(G1_MATRIX)
+
+        assert isinstance(result, list)
+        assert len(result) == 6

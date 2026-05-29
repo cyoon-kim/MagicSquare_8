@@ -60,7 +60,7 @@ class TestFr01Ac05Ac23UseCaseIsolation:
         mocks["blank_finder"].find.assert_not_called()
         mocks["missing_number_finder"].find.assert_not_called()
         mocks["magic_square_validator"].is_valid.assert_not_called()
-        mocks["solver"].solve.assert_not_called()
+        mocks["solver"].solve_or_error.assert_not_called()
         assert result is not None
         assert result.error.code == input_size_invalid_code
         assert result.error.code == "INPUT_SIZE_INVALID"
@@ -102,5 +102,5 @@ class TestFr01Ac05Ac23UseCaseIsolation:
         mocks["blank_finder"].find.assert_not_called()
         mocks["missing_number_finder"].find.assert_not_called()
         mocks["magic_square_validator"].is_valid.assert_not_called()
-        mocks["solver"].solve.assert_not_called()
+        mocks["solver"].solve_or_error.assert_not_called()
         mocks["result_formatter"].format.assert_not_called()
