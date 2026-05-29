@@ -1,3 +1,4 @@
+
 # MagicSquare_cyoon
 
 4×4 마방진(Magic Square) **두 칸 완성**을 다루는 TDD · ECB 아키텍처 학습 프로젝트입니다.
