@@ -32,3 +32,5 @@ G3_MATRIX: list[list[int]] = [
 ]
 
 G1_EXPECTED_STEP_A: list[int] = [1, 2, 3, 1, 4, 13]
+G1_EXPECTED_DOMAIN_STEP_A: list[int] = [0, 1, 3, 0, 3, 13]
+G2_EXPECTED_DOMAIN_STEP_B: list[int] = [0, 0, 16, 0, 1, 3]

@@ -17,7 +17,7 @@ from entity.missing_number_finder import MissingNumberFinder
 
 
 class Solver:
-    """Tries two assignment orders for two blanks; returns int[6] 1-index."""
+    """Tries two assignment orders for two blanks; returns int[6] 0-index."""
 
     def __init__(self) -> None:
         self._blank_finder = BlankFinder()
@@ -65,4 +65,4 @@ class Solver:
         candidate[r2][c2] = second_value
         if not self._validator.is_valid(candidate):
             return None
-        return [r1 + 1, c1 + 1, first_value, r2 + 1, c2 + 1, second_value]
+        return [r1, c1, first_value, r2, c2, second_value]

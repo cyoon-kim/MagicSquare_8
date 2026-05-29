@@ -7,27 +7,34 @@ import pytest
 from boundary.models import DOMAIN_NO_MAGIC_ASSIGNMENT_CODE, ErrorResponse
 from entity.exceptions import UnsolvableDomainError
 from entity.solver import Solver
-from grids import G0_MATRIX, G1_EXPECTED_STEP_A, G1_MATRIX, G2_MATRIX, G3_MATRIX
+from grids import (
+    G0_MATRIX,
+    G1_EXPECTED_DOMAIN_STEP_A,
+    G1_MATRIX,
+    G2_EXPECTED_DOMAIN_STEP_B,
+    G2_MATRIX,
+    G3_MATRIX,
+)
 
 
 @pytest.mark.domain
 @pytest.mark.p0
 class TestDSol01Through04TwoCellSolver:
-    """D-SOL — Solver.solve -> int[6] 1-index or domain failure."""
+    """D-SOL — Solver.solve -> int[6] 0-index domain payload or domain failure."""
 
     def test_d_sol_01_g1_step_a_success_int_six(self) -> None:
         solver = Solver()
 
         result = solver.solve(G1_MATRIX)
 
-        assert result == G1_EXPECTED_STEP_A
+        assert result == G1_EXPECTED_DOMAIN_STEP_A
 
     def test_d_sol_02_g2_step_b_reverse_success(self) -> None:
         solver = Solver()
 
         result = solver.solve(G2_MATRIX)
 
-        assert result == [1, 1, 16, 1, 2, 3]
+        assert result == G2_EXPECTED_DOMAIN_STEP_B
 
     def test_d_sol_03_g3_dual_fail_unsolvable(self) -> None:
         solver = Solver()

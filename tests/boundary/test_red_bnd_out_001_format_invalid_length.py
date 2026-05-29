@@ -1,8 +1,4 @@
-"""RED-BND-OUT-001 — AC-22 malformed output length (FR-05b).
-
-Fails until R4: ResultFormatter must return OUTPUT_FORMAT_INVALID when len != 6.
-Excluded from p0 gate via red_bnd_out marker (intentional RED until slice B).
-"""
+"""RED-BND-OUT-001 — AC-22 malformed output length (FR-05b)."""
 
 from __future__ import annotations
 
@@ -14,7 +10,7 @@ from constants import OUTPUT_FORMAT_INVALID_CODE
 
 
 @pytest.mark.boundary
-@pytest.mark.red_bnd_out
+@pytest.mark.p0
 class TestRedBndOut001FormatInvalidLength:
     """AC-22 — int array length must be 6."""
 
