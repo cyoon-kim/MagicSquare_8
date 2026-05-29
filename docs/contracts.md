@@ -16,7 +16,7 @@
 |---|---|
 | Public input parameter | **`matrix`** — PRD §12.1 `int[4][4]` field name |
 | Internal Domain parameter | `matrix` (same; avoid `grid` in public API) |
-| Layer folders | `src/boundary/`, `src/control/`, `src/domain/` |
+| Layer folders | `src/boundary/`, `src/control/`, `src/entity/` (ECB Entity = Domain Logic) |
 | Legacy samples | `legacy/entity/` — outside Magic Square RED scope |
 
 ---

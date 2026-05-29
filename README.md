@@ -102,11 +102,12 @@ MagicSquare_XX/
 ├── src/
 │   ├── boundary/               # BoundaryValidator, ResultFormatter
 │   ├── control/                # SolveMagicSquareUseCase
-│   └── domain/                 # BlankFinder, Solver, ...
+│   └── entity/                 # Domain Logic (FR-02~05a) — 실습 ECB Entity
 ├── tests/
 │   ├── boundary/
 │   ├── control/
-│   └── legacy/                 # User entity sample (out of RED scope)
+│   ├── entity/                 # Track B Domain RED
+│   └── legacy/                 # User 샘플 (실습 Domain 아님)
 ├── legacy/
 │   └── entity/user.py          # moved from src/entity (learning sample)
 ├── Report/
@@ -124,6 +125,7 @@ MagicSquare_XX/
 | [docs/contracts.md](docs/contracts.md) | API 시그니처 · Pydantic · error code Single Source |
 | [docs/defect_list.md](docs/defect_list.md) | 결함 추적 템플릿 |
 | [docs/red_implementation_checklist.md](docs/red_implementation_checklist.md) | 코드 Sprint 보류 항목 (legacy, skeleton, RED) |
+| [docs/coverage_guide.md](docs/coverage_guide.md) | **실습 §6 커버리지 명령** (entity/boundary gate) |
 | [Report/01_MagicSquare_ProblemDefinition_STEP1-5.md](Report/01_MagicSquare_ProblemDefinition_STEP1-5.md) | STEP 1~5 전체 산출물 |
 | [Prompt/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md](Prompt/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md) | 문제 정의 워크숍 프롬프트 |
 
@@ -174,12 +176,24 @@ MagicSquare_XX/
 
 > **본 Sprint OUT OF SCOPE** — skeleton stub만 존재. RED는 FR-02~05a Sprint에서 진행.
 
-### 커버리지 목표 (Sprint AC-01)
+### 커버리지 목표 (실습 §6 — [`docs/coverage_guide.md`](docs/coverage_guide.md))
 
-- [ ] Boundary (`src/boundary`): **85%+** — `pytest --cov=src/boundary --cov-fail-under=85`
-- [ ] Control (`src/control`): **85%+** — early-return 분기
-- [ ] Domain: **호출 0회** (stub OK) — FR-02~05a Sprint에서 **95%+**
-- [ ] `pip install pytest-cov` → `pytest --cov=src --cov-report=term-missing`
+```bash
+pip install pytest pydantic pytest-cov
+
+# Boundary 85%+ (NFR-02)
+python -m pytest tests/boundary/ --cov=src/boundary --cov-report=term-missing --cov-fail-under=85
+
+# Domain(Entity) 95%+ (NFR-01)
+python -m pytest tests/entity/ --cov=src/entity --cov-report=term-missing --cov-fail-under=95
+
+# 전역 80% (실습 gate)
+python -m pytest --cov=src --cov-report=term-missing --cov-fail-under=80
+```
+
+- [ ] Sprint AC-01: Boundary RED — `ModuleNotFoundError: No module named 'boundary'` (정상)
+- [ ] Sprint AC-01 GREEN 후: Boundary **85%+**, Control early-return **85%+**
+- [ ] FR-02~05a: `tests/entity/` + `src/entity/` **95%+**
 
 ### 결함 목록 연결
 
