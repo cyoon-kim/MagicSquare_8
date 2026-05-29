@@ -23,7 +23,7 @@
 | QA-RISK-005 | High | FR-06 | UseCase `execute()` 호출 | blank/missing finder 결과 활용 | ~~find() 결과 버림~~ | dead orchestration | **Close (R6):** Solver-only path |
 | QA-RISK-006 | High | §13 | `Solver.solve()` vs `solve_or_error()` | 단일 error 객체 API | ~~raise + ErrorResponse 이중 API~~ | 설계 미정 | **Close (R5):** `solve()` only |
 | QA-RISK-007 | Medium | NFR-02 | `pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85` | ≥85% | ~38% FAIL (full) | `screen/` 0% | **정책 결정:** core omit gate (coverage_guide §4); smoke는 R3/R11 후 |
-| QA-RISK-008 | Medium | — | `grep "print(" src/` | print 없음 | `app.py:44-47` | dev CLI 잔존 | R11 |
+| QA-RISK-008 | Medium | — | `grep "print(" src/` | print 없음 | ~~app.py print~~ | dev CLI 잔존 | **Close (R11):** logging |
 | QA-RISK-011 | Low | §13 | `models.py` 오류 코드 목록 | PRD §13 전체 | 4개 코드 미등록 | GREEN Sprint 범위 밖 | R1/R4/R5 |
 
 ---
@@ -66,7 +66,7 @@ pytest tests/boundary/ --cov=src/boundary --cov-fail-under=85
 - [x] QA-RISK-001 Close (R1 contracts)
 - [x] QA-RISK-003 Close (R4 FR-05b)
 - [x] QA-RISK-005 Close (R6 orchestration)
-- [x] QA-RISK-006 Close (R5 solver API)
+- [x] QA-RISK-008 Close (R11 logging)
 - [x] AC-22 RED-BND-OUT-001/002 GREEN (R4) — p0 gate 포함
 - [x] NFR-04 matrix 불변성 테스트 — `test_nfr_04_matrix_immutability.py`
 - [x] AC-24 UseCase G3 → ErrorResponse — `test_ac_24_g3_failure_no_success_format.py`

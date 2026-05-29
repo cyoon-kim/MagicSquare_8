@@ -9,6 +9,14 @@ class MissingNumberFinder:
     """Returns missing values from 1..16 not present in matrix (ascending)."""
 
     def find(self, matrix: list[list[int]]) -> list[int]:
+        """Return missing values from 1..16 not present in the grid.
+
+        Args:
+            matrix: Domain grid (may contain zeros).
+
+        Returns:
+            Ascending list of missing cell values.
+        """
         present = {cell for row in matrix for cell in row if cell != 0}
         return [
             value

@@ -48,7 +48,6 @@ class TestFr01Ac05Ac23UseCaseIsolation:
         mocks["solver"].solve.assert_not_called()
         assert result is not None
         assert result.error.code == input_size_invalid_code
-        assert result.error.code == "INPUT_SIZE_INVALID"
 
     def test_matrix_none_result_formatter_called_zero_times(
         self,

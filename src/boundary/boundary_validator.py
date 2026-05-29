@@ -39,6 +39,14 @@ class BoundaryValidator:
     def validate(
         self, matrix: list[list[int]] | None
     ) -> ErrorResponse | None:
+        """Validate FR-01 input contract for a 4×4 matrix.
+
+        Args:
+            matrix: Public input grid or ``None``.
+
+        Returns:
+            ``ErrorResponse`` when validation fails; ``None`` when input is valid.
+        """
         if matrix is None:
             return _input_size_invalid_response()
         if not is_matrix_4x4(matrix, MATRIX_ORDER_4X4):

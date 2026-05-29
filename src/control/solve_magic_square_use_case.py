@@ -23,6 +23,14 @@ class SolveMagicSquareUseCase:
     def execute(
         self, matrix: list[list[int]] | None
     ) -> list[int] | ErrorResponse:
+        """Run FR-06 orchestration for the public ``matrix`` input.
+
+        Args:
+            matrix: Boundary input grid per PRD (``None`` allowed).
+
+        Returns:
+            External ``int[6]`` success payload or ``ErrorResponse``.
+        """
         validation_error = self._boundary_validator.validate(matrix)
         if validation_error is not None:
             return validation_error

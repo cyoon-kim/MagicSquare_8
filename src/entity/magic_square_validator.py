@@ -9,6 +9,14 @@ class MagicSquareValidator:
     """Validates a complete 4x4 grid (no zeros) against magic square rules."""
 
     def is_valid(self, matrix: list[list[int]]) -> bool:
+        """Return True when the grid satisfies 4×4 magic square rules.
+
+        Args:
+            matrix: Complete candidate grid without zeros.
+
+        Returns:
+            True if rows, columns, and diagonals sum to the magic constant.
+        """
         if any(cell == 0 for row in matrix for cell in row):
             return False
         order = MATRIX_ORDER_4X4

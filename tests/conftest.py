@@ -10,6 +10,9 @@ from pathlib import Path
 
 import pytest
 
+from control.factory import build_solve_magic_square_use_case
+from control.solve_magic_square_use_case import SolveMagicSquareUseCase
+
 ROOT: Path = Path(__file__).resolve().parents[1]
 SRC_PATH: Path = ROOT / "src"
 TESTS_PATH: Path = Path(__file__).resolve().parent
@@ -34,6 +37,12 @@ assert _constants_spec.loader is not None
 _constants_spec.loader.exec_module(_constants_mod)
 INPUT_SIZE_INVALID_CODE = _constants_mod.INPUT_SIZE_INVALID_CODE
 INPUT_SIZE_INVALID_MESSAGE = _constants_mod.INPUT_SIZE_INVALID_MESSAGE
+
+
+@pytest.fixture
+def solve_use_case() -> SolveMagicSquareUseCase:
+    """Fully wired use case for Track A/C integration tests (R8 SSOT)."""
+    return build_solve_magic_square_use_case()
 
 
 @pytest.fixture

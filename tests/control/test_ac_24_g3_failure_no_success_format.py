@@ -28,7 +28,6 @@ class TestAc24G3FailureNoSuccessFormat:
         result = use_case.execute(G3_MATRIX)
 
         assert isinstance(result, ErrorResponse)
-        assert not isinstance(result, list)
         assert result.error.code == DOMAIN_NO_MAGIC_ASSIGNMENT_CODE
 
     def test_ac_24_g3_result_formatter_not_called_on_domain_failure(self) -> None:

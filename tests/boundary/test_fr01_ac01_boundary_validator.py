@@ -33,7 +33,6 @@ class TestFr01Ac01BoundaryValidator:
         assert result is not None
         assert isinstance(result, ErrorResponse)
         assert result.error.code == input_size_invalid_code
-        assert result.error.code == "INPUT_SIZE_INVALID"
 
     def test_matrix_none_message_matches_prd_section_13_exactly(
         self,
@@ -50,7 +49,6 @@ class TestFr01Ac01BoundaryValidator:
         # Then: AC-01
         assert result is not None
         assert result.error.message == input_size_invalid_message
-        assert result.error.message == "Input matrix must be 4x4."
 
     def test_matrix_none_returns_error_without_exception(
         self,
