@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import sys
+
+pytest_plugins = ["golden_master_conftest"]
 import importlib.util
 from pathlib import Path
 

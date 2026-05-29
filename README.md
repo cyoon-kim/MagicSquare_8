@@ -101,6 +101,59 @@ python -m boundary.screen.app
 
 ---
 
+## Golden Master 회귀 테스트 (GM-1)
+
+`SolveMagicSquareUseCase`의 **실제 출력**을 스냅샷으로 고정하는 Approval / Golden Master 회귀 레이어입니다.  
+단위 AC 테스트(U-OUT, U-IN 등)를 대체하지 않으며, **Control E2E 출력 계약** 변경을 한 번에 감지합니다.
+
+| 항목 | 내용 |
+|------|------|
+| **Test ID** | GM-1 |
+| **기준 파일** | `tests/golden_master_expected.txt` (Git 버전 관리 필수) |
+| **시나리오 SSOT** | `tests/golden_master_scenarios.py` |
+| **설계 문서** | [docs/golden_master_design.md](docs/golden_master_design.md) |
+
+### 시나리오 (5종)
+
+| Section | 의미 |
+|---------|------|
+| `normal_success` | 정상 조합 성공 (Attempt 2 reverse) |
+| `reverse_success` | G2 / PRD TD-02 reverse 성공 |
+| `invalid_blank_count` | 빈칸 0개 → `INPUT_BLANK_COUNT_INVALID` |
+| `duplicate_number` | non-zero 중복 → `INPUT_DUPLICATE_NON_ZERO` |
+| `no_valid_solution` | G3 dual-fail → `DOMAIN_NO_MAGIC_ASSIGNMENT` |
+
+### 실행
+
+```powershell
+cd MagicSquare_XX
+
+# 회귀 검증
+pytest tests/test_gm_01_magic_square_golden_master.py -v
+
+# 의도적 출력 변경 후 기준 갱신 (approve)
+pytest tests/test_gm_01_magic_square_golden_master.py --approve-golden -v
+
+# CLI로 생성/갱신
+python scripts/generate_golden_master.py
+
+# CI compare-only (불일치 시 exit 1)
+python scripts/generate_golden_master.py --check
+```
+
+### Approve 패턴
+
+| 상태 | 동작 | 결과 |
+|------|------|------|
+| 기준 파일 **없음** | 현재 출력으로 자동 생성 | PASS (`created`) |
+| 기준 파일 **있음**, 일치 | actual vs expected 비교 | PASS (`matched`) |
+| **불일치** | unified diff 출력 후 FAIL | FAIL |
+| `--approve-golden` / generate script | 기준 파일 덮어쓰기 | PASS (`updated`) |
+
+출력 캡처는 stdout이 아니라 **Result DTO 직렬화** (`list[int]` 성공 / `ErrorResponse.error.code` 실패)입니다.
+
+---
+
 ## 저장소 구조
 
 ```
@@ -111,7 +164,10 @@ MagicSquare_XX/
 │   ├── PRD_MagicSquare.md
 │   ├── test_plan.md
 │   ├── contracts.md            # API Single Source of Truth
+│   ├── golden_master_design.md # GM-1 Approve 패턴 설계
 │   └── defect_list.md
+├── scripts/
+│   └── generate_golden_master.py
 ├── src/
 │   ├── boundary/               # BoundaryValidator, ResultFormatter
 │   │   └── screen/             # PyQt6 GUI (예제 패턴: QSpinBox + 풀기)
@@ -121,6 +177,11 @@ MagicSquare_XX/
 │   ├── boundary/
 │   ├── control/
 │   ├── entity/                 # Track B Domain RED
+│   ├── golden_master_expected.txt   # GM-1 기준 출력 (버전 관리)
+│   ├── golden_master_scenarios.py
+│   ├── golden_master_support.py
+│   ├── golden_master_conftest.py
+│   ├── test_gm_01_magic_square_golden_master.py
 │   └── legacy/                 # User 샘플 (실습 Domain 아님)
 ├── legacy/
 │   └── entity/user.py          # moved from src/entity (learning sample)
@@ -140,6 +201,7 @@ MagicSquare_XX/
 | [docs/defect_list.md](docs/defect_list.md) | 결함 추적 템플릿 |
 | [docs/red_implementation_checklist.md](docs/red_implementation_checklist.md) | 코드 Sprint 보류 항목 (legacy, skeleton, RED) |
 | [docs/coverage_guide.md](docs/coverage_guide.md) | **실습 §6 커버리지 명령** (entity/boundary gate) |
+| [docs/golden_master_design.md](docs/golden_master_design.md) | GM-1 Golden Master · Approve 패턴 · 시나리오·실행 방법 |
 | [Report/01_MagicSquare_ProblemDefinition_STEP1-5.md](Report/01_MagicSquare_ProblemDefinition_STEP1-5.md) | STEP 1~5 전체 산출물 |
 | [Prompt/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md](Prompt/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md) | 문제 정의 워크숍 프롬프트 |
 
@@ -160,6 +222,7 @@ MagicSquare_XX/
 - [ ] Track B Domain RED (FR-02~05a)  
 - [ ] 실행 환경 · CI gate  
 - [ ] (선택) 생성기 · UI  
+- [x] GM-1 Golden Master — `tests/golden_master_expected.txt` + approve 패턴
 
 ---
 
