@@ -30,8 +30,8 @@ Boundary에서 입력을 검증하고, Domain에서 조합을 시도한 뒤, 성
 cd MagicSquare_XX
 pip install -e ".[dev]"
 
-# P0 회귀
-python -m pytest tests/boundary/ tests/control/ tests/entity/ -m p0 -v
+# P0 회귀 (55 tests)
+python -m pytest tests/boundary/ tests/control/ tests/entity/ tests/contracts/ -m p0 -v
 
 # Golden Master
 python -m pytest tests/test_gm_01_magic_square_golden_master.py -v
@@ -41,15 +41,19 @@ python -m pytest -m golden_master -v
 ### 커버리지 gate ([`docs/coverage_guide.md`](docs/coverage_guide.md))
 
 ```powershell
-# Entity 95%+ (NFR-01) — PASS (Report/11: 96.55%)
-python -m pytest tests/entity/ --cov=src/entity --cov-report=term-missing --cov-fail-under=95
+# Entity + Control ≥95% (NFR-01) — REFACTOR baseline PASS
+python -m pytest tests/entity/ tests/control/ --cov=src/entity --cov=src/control --cov-report=term-missing --cov-fail-under=95
 
-# Boundary 85%+ (NFR-02) — screen/ 포함 시 FAIL (~38%); omit 또는 smoke 정책 필요
-python -m pytest tests/boundary/ --cov=src/boundary --cov-report=term-missing --cov-fail-under=85
+# Boundary core ≥85% (NFR-02) — screen/ omit (QA-RISK-007 정책)
+python -m coverage run --source=src/boundary --omit="src/boundary/screen/*" -m pytest tests/boundary/ -q
+python -m coverage report --fail-under=85
 
-# 전역 80%+
+# 전역 src ≥80% (실습 §6)
 python -m pytest tests/boundary/ tests/control/ tests/entity/ --cov=src --cov-report=term-missing --cov-fail-under=80
 ```
+
+> **참고:** `screen/` 포함 full boundary gate는 ~71%로 **FAIL** — 회귀 gate에는 core omit만 사용.  
+> 상세: [`docs/coverage_guide.md`](docs/coverage_guide.md) §4 · [`Report/14`](Report/14_MagicSquare_Full_REFACTOR_Sprint_Report.md) §6
 
 ### GUI (PyQt6)
 
@@ -63,20 +67,69 @@ python -m boundary.screen.app
 
 ---
 
+## 품질 · 커버리지 · 성능
+
+**기준선:** REFACTOR Sprint 종료 (`refactor/refactor`, [Report/14](Report/14_MagicSquare_Full_REFACTOR_Sprint_Report.md), 2026-05-29)
+
+### 회귀 테스트
+
+| Gate | 명령 | 기준 | 실측 |
+|------|------|------|------|
+| **P0** | `pytest tests/boundary/ tests/control/ tests/entity/ tests/contracts/ -m p0 -q` | 전부 Pass | **55 passed** |
+| **GM-1** | `pytest tests/test_gm_01_magic_square_golden_master.py -q` | matched | **6 passed** |
+| **Contracts** | `pytest tests/contracts/ -q` | schema parity | Pass |
+
+### 커버리지 (NFR-01 / NFR-02 / global)
+
+| Gate | 범위 | 목표 | 실측 | 판정 |
+|------|------|------|------|------|
+| Entity+Control | `src/entity` + `src/control` | ≥95% | **98.32%** (119 stmts, 2 miss) | PASS |
+| Entity only | `src/entity` | ≥95% | ~96%+ (Report/11) | PASS |
+| Boundary core | `src/boundary` **screen omit** | ≥85% | **97%** (75 stmts, 2 miss) | PASS |
+| Boundary full | `src/boundary` **screen 포함** | ≥85% | ~71% | FAIL (smoke 미구현) |
+| Global | `src/` (boundary+control+entity+contracts) | ≥80% | **84.35%** (294 stmts) | PASS |
+| Legacy | `legacy/` | ≥80% | **79%** | FAIL ([DEF-005](docs/defect_list.md)) |
+
+**미커버 참고:** `magic_square_validator.py` L34/36, `result_formatter.py` L40/50 (error 분기).
+
+### 성능 (NFR-05)
+
+| 항목 | PRD | 상태 |
+|------|-----|------|
+| **NFR-05** | 단일 `execute()` ≤ 50ms | **로컬 벤치마크 PASS** (자동 smoke 테스트 **미구현**) |
+
+로컬 측정 (`build_solve_magic_square_use_case()`, G1/G3, n=1000, Python 3.13 / Windows):
+
+| 시나리오 | p50 | p95 | max |
+|----------|-----|-----|-----|
+| G1 success | ~0.01ms | ~0.02ms | ~0.14ms |
+| G3 failure | ~0.02ms | ~0.02ms | ~0.06ms |
+
+4×4·두 칸 조합 탐색은 상수 시간이라 PRD 50ms gate에 여유가 큽니다. CI용 perf smoke는 [`docs/refactor-plan.md`](docs/refactor-plan.md) §7 NFR 공백에 남아 있습니다.
+
+### 기타 NFR
+
+| ID | 요구 | 상태 |
+|----|------|------|
+| NFR-03 | 동일 입력 → 동일 출력 (idempotency) | GM-1 + P0로 간접 검증 |
+| NFR-04 | 입력 `matrix` 불변 | `test_nfr_04_matrix_immutability.py` p0 |
+| NFR-06 | ECB 의존 방향 | R1~R3 Close (import smoke) |
+
+---
+
 ## ECB 레이어
 
 ```
 boundary/          control/                    entity/
 ├── BoundaryValidator   SolveMagicSquareUseCase   ├── BlankFinder
-├── ResultFormatter     (FR-06 orchestration)     ├── MissingNumberFinder
-├── models (ErrorResponse)                        ├── MagicSquareValidator
+├── ResultFormatter     factory / ports           ├── MissingNumberFinder
+├── models → contracts  (FR-06 orchestration)     ├── MagicSquareValidator
 └── screen/ (PyQt6)                               └── Solver
 ```
 
-**의존 방향:** `boundary → control → entity` · `entity → (none)`
+**의존 방향:** `boundary → control → entity` · 공유 DTO `src/contracts/` · `entity → (none)`
 
-> **REFACTOR 알림:** 현재 entity→boundary, control→boundary, `app.py`→entity 위반이 기록되어 있습니다.  
-> 상세: [`docs/refactor-plan.md`](docs/refactor-plan.md) · [`docs/defect_list.md`](docs/defect_list.md) (QA-RISK-001~011)
+> REFACTOR Sprint에서 ECB 위반(AV-01~03) **해소** — [`Report/14`](Report/14_MagicSquare_Full_REFACTOR_Sprint_Report.md) · [`docs/defect_list.md`](docs/defect_list.md)
 
 ---
 
@@ -137,8 +190,8 @@ MagicSquare_XX/
 │   ├── test_gm_01_magic_square_golden_master.py
 │   └── legacy/                 # User 샘플 (실습 Domain 아님)
 ├── legacy/entity/user.py
-├── Report/                     # 진행 보고서 (최신: 13)
-├── Prompt/                     # Transcript (최신: 13)
+├── Report/                     # 진행 보고서 (최신: 14)
+├── Prompt/                     # Transcript (최신: 14)
 └── scripts/generate_golden_master.py
 ```
 
@@ -155,8 +208,9 @@ MagicSquare_XX/
 | [docs/defect_list.md](docs/defect_list.md) | DEF Close/Open, QA-RISK 레지스트리 |
 | [docs/coverage_guide.md](docs/coverage_guide.md) | entity/boundary/global 커버리지 gate |
 | [docs/golden_master_design.md](docs/golden_master_design.md) | GM-1 Approve 패턴 |
+| [Report/14_MagicSquare_Full_REFACTOR_Sprint_Report.md](Report/14_MagicSquare_Full_REFACTOR_Sprint_Report.md) | REFACTOR Sprint 완료 · cov/품질 baseline |
+| [Prompt/14_MagicSquare_Full_REFACTOR_Sprint_transcript.md](Prompt/14_MagicSquare_Full_REFACTOR_Sprint_transcript.md) | 대응 Transcript |
 | [Report/13_MagicSquare_CodeReview_QA_RefactorPlan_Report.md](Report/13_MagicSquare_CodeReview_QA_RefactorPlan_Report.md) | code-reviewer·QA 검토 보고 |
-| [Prompt/13_MagicSquare_CodeReview_QA_RefactorPlan_transcript.md](Prompt/13_MagicSquare_CodeReview_QA_RefactorPlan_transcript.md) | 대응 Transcript |
 
 ---
 
@@ -170,7 +224,7 @@ MagicSquare_XX/
 - [x] Control (FR-06) — `SolveMagicSquareUseCase`
 - [x] GM-1 Golden Master (GM-TC-01~05)
 - [x] PyQt6 Screen ([Report/12](Report/12_MagicSquare_PyQt6_Screen_Migration_Report.md))
-- [x] REFACTOR 계획 · QA 리스크 정리 ([Report/13](Report/13_MagicSquare_CodeReview_QA_RefactorPlan_Report.md))
+- [x] REFACTOR Sprint 7/7 ([Report/14](Report/14_MagicSquare_Full_REFACTOR_Sprint_Report.md))
 
 ### REFACTOR Sprint
 
@@ -245,8 +299,8 @@ MagicSquare_XX/
 ## TDD · 프로젝트 규칙
 
 - **프레임워크:** pytest, AAA 패턴
-- **커버리지:** entity ≥95%, boundary ≥85%, global ≥80%
-- **business error:** `ErrorResponse` 객체 반환 — `pytest.raises` 금지 (entity는 R5에서 정렬 예정)
+- **커버리지:** entity+control ≥95%, boundary core (screen omit) ≥85%, global ≥80% — [품질 섹션](#품질--커버리지--성능) 참조
+- **business error:** `ErrorResponse` 객체 반환 — public path `pytest.raises` 금지
 - **금지:** production `src/`에 `print()`, bare `except:`, 의미 없는 매직 상수
 - **Cursor rules:** `.cursor/rules/magicsquare-*.mdc`
 
