@@ -1,7 +1,7 @@
 # MagicSquare_cyoon
 
 4×4 마방진(Magic Square)을 다루는 학습·연습 프로젝트입니다.  
-현재는 **구현 전 단계**로, STEP 1~5 **문제 정의**까지 완료한 상태입니다.
+현재는 **명세 완료 · RED 진행 중** — PRD v1.1, test_plan, contracts 고정 후 AC-01 Track A RED skeleton 작성 단계입니다.
 
 ---
 
@@ -13,8 +13,8 @@
 |------|------|
 | **표면 문제 (피할 정의)** | “4×4 마방진을 완성하는 프로그램” |
 | **진짜 문제** | 고정된 규칙으로 배치의 **유효성을 판정**하고, 조건·입출력·불변을 **먼저 명시**하는 연습 |
-| **현재 단계** | 문제 인식 · Why 분석 · 진짜 문제 정의 (STEP 1~5) |
-| **다음 단계** | 인수 조건 · TDD 기반 검증 코어 · (선택) UI/생성기 |
+| **현재 단계** | PRD · test_plan · contracts 완료 → FR-01 AC-01 RED |
+| **다음 단계** | RED 테스트 → GREEN 최소 구현 → Track B Domain |
 
 ---
 
@@ -91,12 +91,26 @@
 ## 저장소 구조
 
 ```
-MagicSquare_cyoon/
-├── README.md                 ← 이 파일
+MagicSquare_XX/
+├── README.md
+├── pyproject.toml              # pytest, pydantic, pytest-cov
+├── docs/
+│   ├── PRD_MagicSquare.md
+│   ├── test_plan.md
+│   ├── contracts.md            # API Single Source of Truth
+│   └── defect_list.md
+├── src/
+│   ├── boundary/               # BoundaryValidator, ResultFormatter
+│   ├── control/                # SolveMagicSquareUseCase
+│   └── domain/                 # BlankFinder, Solver, ...
+├── tests/
+│   ├── boundary/
+│   ├── control/
+│   └── legacy/                 # User entity sample (out of RED scope)
+├── legacy/
+│   └── entity/user.py          # moved from src/entity (learning sample)
 ├── Report/
-│   └── 01_MagicSquare_ProblemDefinition_STEP1-5.md   # STEP 1~5 통합 보고서
-└── Prompting/
-    └── 01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md   # 문제 정의 워크숍 프롬프트
+└── Prompt/
 ```
 
 ---
@@ -105,8 +119,13 @@ MagicSquare_cyoon/
 
 | 문서 | 설명 |
 |------|------|
-| [Report/01_MagicSquare_ProblemDefinition_STEP1-5.md](Report/01_MagicSquare_ProblemDefinition_STEP1-5.md) | STEP 1~5 전체 산출물 (관찰, Why, 진짜 문제 정의, Invariant, 요약) |
-| [Prompting/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md](Prompting/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md) | 문제 정의 워크숍용 프롬프트 |
+| [docs/PRD_MagicSquare.md](docs/PRD_MagicSquare.md) | FR/AC/BR, I/O 계약, Dual-Track TDD 전략 |
+| [docs/test_plan.md](docs/test_plan.md) | FR-01 AC-01 테스트 계획 (BV, mock, pytest-cov) |
+| [docs/contracts.md](docs/contracts.md) | API 시그니처 · Pydantic · error code Single Source |
+| [docs/defect_list.md](docs/defect_list.md) | 결함 추적 템플릿 |
+| [docs/red_implementation_checklist.md](docs/red_implementation_checklist.md) | 코드 Sprint 보류 항목 (legacy, skeleton, RED) |
+| [Report/01_MagicSquare_ProblemDefinition_STEP1-5.md](Report/01_MagicSquare_ProblemDefinition_STEP1-5.md) | STEP 1~5 전체 산출물 |
+| [Prompt/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md](Prompt/01_MagicSquare_ProblemDefinition_STEP1-5_prompt.md) | 문제 정의 워크숍 프롬프트 |
 
 ---
 
@@ -117,10 +136,55 @@ MagicSquare_cyoon/
 - [x] STEP 3 — Why #2  
 - [x] STEP 4 — Why #3  
 - [x] STEP 5 — 진짜 문제 정의  
-- [ ] 인수 조건 · 용어 사전  
-- [ ] 검증 코어 (TDD)  
-- [ ] 실행 환경 · 의존성  
+- [x] PRD v1.1 — Functional Requirements · Error Policy  
+- [x] test_plan v1.1 — FR-01 AC-01  
+- [x] contracts.md — API / terminology 고정  
+- [ ] FR-01 AC-01 RED 테스트  
+- [ ] FR-01 GREEN (BoundaryValidator)  
+- [ ] Track B Domain RED (FR-02~05a)  
+- [ ] 실행 환경 · CI gate  
 - [ ] (선택) 생성기 · UI  
+
+---
+
+## RED 단계 To-Do 리스트
+
+> [`docs/test_plan.md`](docs/test_plan.md) · [`docs/PRD_MagicSquare.md`](docs/PRD_MagicSquare.md) · [`docs/contracts.md`](docs/contracts.md) 기반.  
+> **Sprint 범위:** FR-01 AC-01 · AC-05 · AC-23 · TS-E-01 · 공개 파라미터명 **`matrix`**
+
+### Track A — Boundary (FR-01)
+
+- [ ] TC-A-01 (BV-01): `matrix=None` → `ErrorResponse`, 예외 throw 없음 (AC-01, §13)
+- [ ] TC-A-02: `error.code == "INPUT_SIZE_INVALID"` (AC-01, §12.1)
+- [ ] TC-A-03: `error.message == "Input matrix must be 4x4."` (§13)
+- [ ] TC-A-05 (BV-02): `matrix=[]` → `INPUT_SIZE_INVALID` (AC-01)
+- [ ] TC-A-06 (BV-03): `matrix=[[]]*4` → `INPUT_SIZE_INVALID` (AC-01)
+- [ ] TC-A-07 (BV-04~06): 3×4 · 4×3 · 5×5 · TD-03 → `INPUT_SIZE_INVALID` (AC-01, TS-E-01)
+- [ ] TC-A-08: §13 Pydantic `ErrorResponse` 스키마 준수
+- [ ] TC-A-09: TD-01(4×4 정상) 테스트 **미포함** 확인
+
+### Track A-2 — Control 격리 (FR-06, AC-05, AC-23)
+
+- [ ] TC-A2-01 (TC-A-04): `matrix=None` 시 Domain chain 0회 — `BlankFinder` · `MissingNumberFinder` · `MagicSquareValidator` · `Solver` mock/spy
+- [ ] TC-A2-02: `ResultFormatter.format()` 0회 호출 (FR-01 fail path)
+- [ ] TC-A2-03: Domain/Formatter mock `call_count > 0` → 테스트 실패
+- [ ] TC-A2-04: AC-02~04(TS-E-02~04) **본 Sprint RED 미포함** 확인
+
+### Track B — Domain Logic (FR-02~05a)
+
+> **본 Sprint OUT OF SCOPE** — skeleton stub만 존재. RED는 FR-02~05a Sprint에서 진행.
+
+### 커버리지 목표 (Sprint AC-01)
+
+- [ ] Boundary (`src/boundary`): **85%+** — `pytest --cov=src/boundary --cov-fail-under=85`
+- [ ] Control (`src/control`): **85%+** — early-return 분기
+- [ ] Domain: **호출 0회** (stub OK) — FR-02~05a Sprint에서 **95%+**
+- [ ] `pip install pytest-cov` → `pytest --cov=src --cov-report=term-missing`
+
+### 결함 목록 연결
+
+- [ ] [`docs/defect_list.md`](docs/defect_list.md) 발견 결함 기록
+- [ ] 결함 수정 후 회귀 테스트 통과
 
 ---
 

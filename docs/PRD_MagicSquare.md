@@ -479,9 +479,12 @@ Expected: error DOMAIN_NO_MAGIC_ASSIGNMENT
 
 현재 본문 요구사항에 Decision Needed 항목 없음 (v1.1).
 
+**Closed (v1.1 — AC-01 extension):** FR-01 AC-01 size validation explicitly includes defensive inputs beyond TD-03: `matrix=None`, `matrix=[]`, `matrix=[[]]*4`, and non-4×4 rectangular matrices (3×4, 4×3, 5×5). See `docs/test_plan.md` BV-01~06 and `docs/contracts.md` §6.
+
 향후 재오픈 가능:
 - Message i18n
 - TD-07 대체 반례 행렬
+- AC-01 P2 defensive checks (ragged rows, non-list type) — see `docs/contracts.md` §6
 
 ---
 
