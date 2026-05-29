@@ -28,6 +28,7 @@ markers = [
     "boundary: Track A boundary layer tests",
     "control: Track A-2 control layer tests",
     "domain: Track B domain layer tests",
+    "golden_master: GM-1 approval / golden master regression tests",
 ]
 
 [tool.coverage.run]

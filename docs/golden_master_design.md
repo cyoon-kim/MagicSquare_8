@@ -5,7 +5,7 @@
 | **Test ID** | GM-1 |
 | **유형** | 회귀 테스트 (Approval / Golden Master) |
 | **기준 파일** | `tests/golden_master_expected.txt` |
-| **실행** | `pytest tests/test_gm_01_magic_square_golden_master.py` |
+| **실행** | `pytest tests/test_gm_01_magic_square_golden_master.py -v` |
 | **갱신** | `pytest --approve-golden` 또는 `python scripts/generate_golden_master.py` |
 | **작성일** | 2026-05-29 |
 
@@ -61,11 +61,11 @@ flowchart TD
 
 | Section | 격자 | Domain 의미 | 기대 출력 |
 |---------|------|-------------|-----------|
-| `normal_success` | Step B-only 성공 격자 | Attempt 1 실패, Attempt 2 성공 | `[3,3,6,4,4,1]` |
-| `reverse_success` | G2 (PRD TD-02) | Attempt 2 reverse 성공 | `[1,1,16,1,2,3]` |
-| `invalid_blank_count` | G0 (완전 격자) | 빈칸 0개 | `INPUT_BLANK_COUNT_INVALID` |
-| `duplicate_number` | U-IN-06 | non-zero 중복 | `INPUT_DUPLICATE_NON_ZERO` |
-| `no_valid_solution` | G3 (PRD TD) | Attempt 1·2 모두 실패 | `DOMAIN_NO_MAGIC_ASSIGNMENT` |
+| `normal_success` (GM-TC-01) | G1 (PRD TD-01) | Attempt 1 small-first 성공 | `[1,2,3,1,4,13]` |
+| `reverse_success` (GM-TC-02) | G2 (PRD TD-02) | Attempt 2 reverse 성공 | `[1,1,16,1,2,3]` |
+| `invalid_blank_count` (GM-TC-03) | G0 (완전 격자) | 빈칸 0개 | `INPUT_BLANK_COUNT_INVALID` |
+| `duplicate_number` (GM-TC-04) | U-IN-06 | non-zero 중복 | `INPUT_DUPLICATE_NON_ZERO` |
+| `no_valid_solution` (GM-TC-05) | G3 (PRD TD) | Attempt 1·2 모두 실패 | `DOMAIN_NO_MAGIC_ASSIGNMENT` |
 
 시나리오 정의 SSOT: `tests/golden_master_scenarios.py`
 
@@ -81,7 +81,7 @@ Input:
 9 7 0 12
 4 14 15 0
 Output:
-[3,3,6,4,4,1]
+[1,2,3,1,4,13]
 
 ________________________________________
 
@@ -103,7 +103,7 @@ ________________________________________
 | `tests/golden_master_scenarios.py` | 입력 격자·시나리오 SSOT |
 | `tests/golden_master_support.py` | 캡처·직렬화·approve 비교 |
 | `tests/golden_master_conftest.py` | `--approve-golden` pytest 옵션 |
-| `tests/test_gm_01_magic_square_golden_master.py` | GM-1 회귀 테스트 |
+| `tests/test_gm_01_magic_square_golden_master.py` | GM-1 회귀 테스트 (GM-TC-01~05) |
 | `scripts/generate_golden_master.py` | CI/로컬 기준 파일 생성·검증 CLI |
 
 ---
@@ -113,6 +113,7 @@ ________________________________________
 ```bash
 # 회귀 검증 (기본)
 pytest tests/test_gm_01_magic_square_golden_master.py -v
+pytest -m golden_master -v
 
 # 의도적 출력 변경 후 기준 갱신
 pytest tests/test_gm_01_magic_square_golden_master.py --approve-golden -v

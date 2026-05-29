@@ -115,13 +115,13 @@ python -m boundary.screen.app
 
 ### 시나리오 (5종)
 
-| Section | 의미 |
-|---------|------|
-| `normal_success` | 정상 조합 성공 (Attempt 2 reverse) |
-| `reverse_success` | G2 / PRD TD-02 reverse 성공 |
-| `invalid_blank_count` | 빈칸 0개 → `INPUT_BLANK_COUNT_INVALID` |
-| `duplicate_number` | non-zero 중복 → `INPUT_DUPLICATE_NON_ZERO` |
-| `no_valid_solution` | G3 dual-fail → `DOMAIN_NO_MAGIC_ASSIGNMENT` |
+| Section | Test ID | 의미 |
+|---------|---------|------|
+| `normal_success` | GM-TC-01 | small-first 조합 성공 (G1) |
+| `reverse_success` | GM-TC-02 | reverse fallback 성공 (G2) |
+| `invalid_blank_count` | GM-TC-03 | 빈칸 0개 → `INPUT_BLANK_COUNT_INVALID` |
+| `duplicate_number` | GM-TC-04 | non-zero 중복 → `INPUT_DUPLICATE_NON_ZERO` |
+| `no_valid_solution` | GM-TC-05 | dual-fail → `DOMAIN_NO_MAGIC_ASSIGNMENT` |
 
 ### 실행
 
@@ -130,6 +130,7 @@ cd MagicSquare_XX
 
 # 회귀 검증
 pytest tests/test_gm_01_magic_square_golden_master.py -v
+pytest -m golden_master -v
 
 # 의도적 출력 변경 후 기준 갱신 (approve)
 pytest tests/test_gm_01_magic_square_golden_master.py --approve-golden -v
@@ -182,6 +183,7 @@ MagicSquare_XX/
 │   ├── golden_master_support.py
 │   ├── golden_master_conftest.py
 │   ├── test_gm_01_magic_square_golden_master.py
+│   ├── test_golden_master_magic_square.py   # alias (no duplicate collection)
 │   └── legacy/                 # User 샘플 (실습 Domain 아님)
 ├── legacy/
 │   └── entity/user.py          # moved from src/entity (learning sample)
@@ -230,6 +232,30 @@ MagicSquare_XX/
 
 > [`docs/test_plan.md`](docs/test_plan.md) · [`docs/PRD_MagicSquare.md`](docs/PRD_MagicSquare.md) · [`docs/contracts.md`](docs/contracts.md) 기반.  
 > **Sprint 범위:** FR-01 AC-01 · AC-05 · AC-23 · TS-E-01 · 공개 파라미터명 **`matrix`**
+
+### Golden Master 회귀 안전장치
+
+> Refactoring 시작 전 구축. GREEN 완료 후 즉시 적용.  
+> 설계: [`docs/golden_master_design.md`](docs/golden_master_design.md)
+
+#### 기준 파일 생성
+
+- [x] **GM-01:** `golden_master_expected.txt` 생성
+- [x] **GM-02:** 정상/역순/오류 시나리오 추가 (GM-TC-01~05)
+- [x] **GM-03:** `git add tests/golden_master_expected.txt` (버전 관리 포함)
+
+#### 테스트 코드
+
+- [x] **GM-04:** `test_gm_01_magic_square_golden_master` 작성
+- [x] **GM-05:** approve 패턴 적용 (`--approve-golden`, `generate_golden_master.py`)
+- [x] **GM-06:** Golden Master 테스트 PASS 확인 (`pytest -m golden_master -v`)
+
+#### 회귀 보호
+
+- [x] **GM-07:** row-major 규칙 보호 (`assert_row_major_blank_order`)
+- [x] **GM-08:** 1-index 출력 보호 (`assert_int6_output_contract`)
+- [x] **GM-09:** reverse 조합 fallback 보호 (`assert_reverse_fallback_combination`)
+- [x] **GM-10:** Error Contract 보호 (`assert_error_contract`)
 
 ### Track A — Boundary (FR-01)
 
